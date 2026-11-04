@@ -19,7 +19,7 @@
 \definecolor{ink}{HTML}{15374A}
 \definecolor{accent}{HTML}{087E8B}
 \definecolor{pale}{HTML}{EEF5F7}
-\hypersetup{pdftitle={MRT-Scananleitung für das Praktikum},pdfauthor={},pdfsubject={Phantomaufbau, Scannerbedienung, Spektrum, Multi-Echo-Aufnahmen und DICOM-Export},pdfdisplaydoctitle=true}
+\hypersetup{pdftitle={Versuchsdurchführung: Magnetresonanztomographie},pdfauthor={},pdfsubject={Phantomaufbau, Scannerbedienung, Spektrum, Multi-Echo-Aufnahmen und DICOM-Export},pdfdisplaydoctitle=true}
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[L]{\small\sffamily\color{ink}MRT-PRAKTIKUM}
@@ -46,6 +46,8 @@
 \newcommand{\bild}[3][]{\par\noindent\begin{minipage}{\linewidth}\centering\adjincludegraphics[width=\linewidth,#1]{#2}\captionof{figure}{#3}\end{minipage}\par}
 
 \begin{document}
+
+\input{deckblatt.tex}
 
 \heading{registrierung}{01 / START UND REGISTRIERUNG}{MRT-Scananleitung}
 Diese Anleitung führt Sie vom Einrichten eines Phantomversuchs bis zum Export der Messdaten. Sie untersuchen Bildfeld und Flipwinkel, bestimmen den Wasser-Fett-Frequenzabstand und nehmen zwei sowie drei Echos auf. Die Dixon-Auswertung im Notebook vergleicht \textbf{eine gemeinsame Schichtebene}; die $B_0$-Auswertung ist optional.
