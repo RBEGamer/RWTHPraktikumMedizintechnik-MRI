@@ -15,7 +15,7 @@ Welcome to the Magnetic Resonance Imaging (MRI) experiment of the Medical Engine
 
 This repository contains the course materials for the experiment, including the preparation script, an illustrated scan guide, a Philips ExamCard, and a Jupyter notebook with DICOM example data. The course materials and notebook instructions are provided in German.
 
-During the experiment, you investigate a water/oil phantom, plan MRI acquisitions, explore imaging parameters, and determine the frequency difference between water and fat. You then compare dual- and triple-echo acquisitions and implement a simple Dixon analysis in the notebook. An optional exercise introduces an approximate B₀ field map.
+During the experiment, you investigate a water/oil phantom, plan MRI acquisitions, explore imaging parameters, and determine the frequency difference between water and fat. In the notebook, you calculate a phase/magnitude colour blend, approximate water/fat signal fractions for each valid pixel, and a simple B₀ frequency map from the outer triple echoes.
 
 Work through the preparation script before the laboratory session. Use the scan guide during the measurements, then practise the analysis with the [Jupyter notebook](notebook/experiment.ipynb).
 
@@ -26,7 +26,7 @@ Work through the preparation script before the laboratory session. Use the scan 
 | [Preparation script](dokumentation/Versuchsskript/Versuchsskript.pdf) | Background and exercises for the MRI experiment. |
 | [Scan guide](dokumentation/Versuchsdurchfuehrung/Versuchsdurchfuehrung.pdf) | Scanner operation, acquisition planning, measurements, and DICOM export. The [LaTeX source](dokumentation/Versuchsdurchfuehrung/Versuchsdurchfuehrung.tex) is included. |
 | [Philips ExamCard](dokumentation/MRSequenzExamCard/LfB_MR_Praktikum.ExamCard) | Prepared measurement sequences. |
-| [Jupyter notebook](notebook/experiment.ipynb) | Dixon analysis and the optional B₀ exercise. See the [notebook instructions](notebook/README.md) for details. |
+| [Jupyter notebook](notebook/experiment.ipynb) | Phase/magnitude colour blend, pixelwise water/fat signal fractions, and a triple-echo B₀ frequency map. See the [notebook instructions](notebook/README.md) for details. |
 | [DICOM example data](notebook/daten/beispiel/README.md) | Magnitude and phase images of one slice, with and without the metal button. |
 
 ## How to run the coding exercises locally?

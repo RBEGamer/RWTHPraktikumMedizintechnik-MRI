@@ -390,76 +390,73 @@ def feldkarte(data, mask, meta, titel, grenze=.6):
     return bild(np.ma.masked_where(~mask, data), titel, meta, (-grenze, grenze), 'RdBu_r', bounds)
 
 
-def wasser_oel_phasenblend(ip, op, phase_ip, phase_op, meta, wasserreferenz):
-    """IP/OP-Phasenlage als Farbgewicht, IP-Magnitude als Helligkeit.
+def phasenreferenz_laden(datei, metadaten):
+    """Vorgegebenen Phasenbezug nur auf den zugehörigen Datensatz anwenden."""
+    import hashlib
+    import json
 
-    Eine bekannte Wasser-ROI setzt den globalen Phasenbezug. Es gibt keine
-    Annahme über oben/unten und keine räumliche B0-Korrektur. Farbgewichte
-    sind keine Stoff- oder Signalanteile einer Dixon-Rekonstruktion.
-    """
+    referenz = json.loads(Path(datei).read_text(encoding='utf-8'))
+    erwartet = referenz['dateien_sha256']
+    if (Path(metadaten[0]['datei']).name != referenz['op_magnitude']
+            or Path(metadaten[1]['datei']).name != referenz['ip_magnitude']):
+        raise ValueError('Die OP-/IP-Zuordnung passt nicht zur Phasenreferenz.')
+    if {Path(m['datei']).name for m in metadaten} != set(erwartet):
+        raise ValueError('Die Phasenreferenz gehört zu anderen Bildern. '
+                         'Für eigene Aufnahmen eine passende Referenz von der Betreuung verwenden.')
+    for meta in metadaten:
+        path = Path(meta['datei'])
+        if hashlib.sha256(path.read_bytes()).hexdigest() != erwartet[path.name]:
+            raise ValueError('Bilddatei passt nicht zur Phasenreferenz: ' + path.name)
+    phase = float(referenz['phase_op_minus_ip_rad'])
+    if not np.isfinite(phase):
+        raise ValueError('Die Referenzphase muss endlich sein.')
+    return phase
+
+
+def phasenblend_anzeigen(rgb, meta):
+    """Bereits im Notebook berechnete RGB-Werte anzeigen; keine Farbrechnung."""
     from matplotlib.patches import Patch
 
-    ip, op, phase_ip, phase_op = (np.asarray(a, dtype=float) for a in
-                                  (ip, op, phase_ip, phase_op))
-    referenz = np.asarray(wasserreferenz, dtype=bool)
-    if ip.ndim != 2 or any(a.shape != ip.shape for a in (op, phase_ip, phase_op, referenz)):
-        raise ValueError('Magnituden, Phasen und Wasserreferenz müssen dieselbe 2D-Form besitzen.')
-    endlich = np.isfinite(ip) & np.isfinite(op) & np.isfinite(phase_ip) & np.isfinite(phase_op)
-    if not endlich.any():
-        raise ValueError('Keine endlichen Bildwerte für den Phasenblend.')
-    skala_ip, skala_op = (float(np.percentile(a[endlich], 99)) for a in (ip, op))
-    if min(skala_ip, skala_op) <= 0:
-        raise ValueError('Der Phasenblend benötigt Signal in beiden Echos.')
-    signal_ip = np.isfinite(ip) & (ip > .15 * skala_ip)
-    gueltig = endlich & signal_ip & (op > .15 * skala_op)
-    referenz = referenz & gueltig
-    if referenz.sum() < 16:
-        raise ValueError('Wasserreferenz enthält weniger als 16 Pixel mit Signal in beiden Echos.')
-
-    # Zirkulär mitteln: ein Sprung von +pi nach -pi darf den Bezug nicht ändern.
-    phasor = np.zeros(ip.shape, dtype=complex)
-    phasor[gueltig] = np.exp(1j * (phase_op[gueltig] - phase_ip[gueltig]))
-    gewichte = (ip[referenz] / skala_ip) * (op[referenz] / skala_op)
-    bezug = np.sum(gewichte * phasor[referenz]) / gewichte.sum()
-    kohaerenz = float(abs(bezug))
-    if kohaerenz < .5:
-        raise ValueError('Phasen in der Wasserreferenz sind inkohärent. '
-                         'Eine kleinere signalstarke Wasser-ROI wählen.')
-    offset = float(np.angle(bezug))
-    delta_phase = np.full(ip.shape, np.nan)
-    delta_phase[gueltig] = np.angle(phasor[gueltig] * np.exp(-1j * offset))
-    oelgewicht = (1 - np.cos(delta_phase)) / 2
-    wassergewicht = 1 - oelgewicht
-
-    # Nur die Darstellung wird auf [0, 1] begrenzt; keine Rechendaten verändern.
-    helligkeit = np.zeros(ip.shape)
-    helligkeit[signal_ip] = np.clip(ip[signal_ip] / skala_ip, 0, 1)
-    rgb = np.zeros((*ip.shape, 3))
-    rgb[..., 0][gueltig] = oelgewicht[gueltig] * helligkeit[gueltig]
-    rgb[..., 2][gueltig] = wassergewicht[gueltig] * helligkeit[gueltig]
-    grau = signal_ip & ~gueltig
-    rgb[grau] = helligkeit[grau, None]
-
-    fig, ax = plt.subplots(figsize=(7, 7.5), constrained_layout=True)
-    extent = _extent(meta, ip.shape)
-    ax.imshow(rgb, extent=extent, interpolation='nearest')
-    dy, dx = meta['pixelabstand_mm']
-    ax.contour(np.arange(ip.shape[1])*dx, np.arange(ip.shape[0])*dy,
-               referenz.astype(float), levels=[.5], colors='white', linewidths=.8)
-    ax.set(title='Öl rot · Wasser blau\nPhasenblend mit Magnitude als Helligkeit',
+    fig, ax = plt.subplots(figsize=(7, 7.2), constrained_layout=True)
+    ax.imshow(rgb, extent=_extent(meta, rgb.shape[:2]), interpolation='nearest')
+    ax.set(title='Phase als Farbe · Magnitude als Helligkeit',
            xlabel='x in Schichtebene [mm]', ylabel='y in Schichtebene [mm]')
     ax.legend(handles=[Patch(color='red', label='öltypische Phasenlage'),
                        Patch(color='blue', label='wassertypische Phasenlage'),
-                       Patch(color='.6', label='Phase nicht auswertbar'),
-                       Patch(facecolor='none', edgecolor='black', label='Weißer Umriss: Wasserreferenz')],
+                       Patch(color='.6', label='Phase nicht auswertbar')],
               loc='upper center', bbox_to_anchor=(.5, -.11), ncol=2, frameon=False)
-    fig.supxlabel('Farbe: relative IP/OP-Phase · Helligkeit: IP-Magnitude\n'
-                  'Wasserreferenziert · keine räumliche B₀-Korrektur / Konzentrationskarte', fontsize=9)
+    fig.supxlabel('Global phasenreferenziert · keine räumliche B₀-Korrektur\n'
+                  'Farbgewichte sind keine gemessenen Wasser-/Fettanteile', fontsize=9)
     plt.show()
-    return SimpleNamespace(figure=fig, rgb=rgb, delta_phase_rad=delta_phase,
-                           oelgewicht=oelgewicht, wassergewicht=wassergewicht,
-                           gueltig=gueltig, referenzmaske=referenz,
-                           phasenoffset_rad=offset, referenz_kohaerenz=kohaerenz)
+    return fig
+
+
+def signalanteile_anzeigen(wasser, fett, fett_prozent, maske, meta):
+    """Berechnete Signale und pixelweise Prozentkarte zeigen; keine Trennung."""
+    from matplotlib.patches import Patch
+
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5.5), constrained_layout=True)
+    lim = fenster(wasser[maske], fett[maske])[1]
+    for ax, data, title, cmap, vmax in zip(
+            axes, [wasser, fett, fett_prozent],
+            ['Wassersignal (Modell)', 'Fett-/Ölsignal (Modell)', 'Fett-Signalanteil (Modell) [%]'],
+            ['Blues', 'Reds', 'RdBu_r'], [lim, lim, 100]):
+        ax.set_facecolor('#e8edf2')
+        im = ax.imshow(np.ma.masked_where(~maske, data), cmap=cmap, vmin=0, vmax=vmax,
+                       extent=_extent(meta, data.shape))
+        prozentkarte = ax is axes[2]
+        kritisch = maske & ((data < 0) | (data > 100)) if prozentkarte else maske & (data < 0)
+        ax.imshow(np.ma.masked_where(~kritisch, np.ones_like(data)),
+                  cmap=ListedColormap(['#f4a340']), vmin=0, vmax=1,
+                  extent=_extent(meta, data.shape))
+        ax.set(title=title, xlabel='x [mm]', ylabel='y [mm]')
+        fig.colorbar(im, ax=ax, shrink=.75, label='%' if prozentkarte else 'Signal [a.u.]')
+    fig.legend(handles=[Patch(color='#f4a340', label='Orange: Modellgrenze verletzt'),
+                        Patch(color='#e8edf2', label='Hellgrau: nicht ausgewertet')],
+               loc='outside lower center', ncol=2, frameon=False)
+    fig.suptitle('Pixelweise Signalanteile · keine Stoffkonzentration oder PDFF', fontsize=13)
+    plt.show()
+    return fig
 
 
 def speichere_bild(fig, name):
