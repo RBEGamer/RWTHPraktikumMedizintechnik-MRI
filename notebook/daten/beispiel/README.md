@@ -21,9 +21,9 @@ Dieser Ordner enthält 20 DICOM-Bilder der Wasser-/Ölflasche auf derselben geom
 
 Die erste Notebook-Zelle lädt `wasser_oel_dual_echo2_magnitude.dcm`. Der Katalog liest Aufnahme, Echozeit, Bildtyp und Geometrie direkt aus den DICOM-Metadaten. Die Auswahlfelder zeigen weiterhin die ursprünglichen Sequenznamen, etwa `T1W_FFE dual echo button` für die Aufnahme mit Knopf; daneben erscheinen die neuen Dateinamen.
 
-Der Datensatz enthält ausschließlich Magnituden und direkte Phasen der Dual- und Triple-Echo-Aufnahmen. Die Wasser-/Öl-Zuordnung erfolgt anhand der bekannten Befüllung und dokumentierten Lagerung, bei den Beispieldaten oben Öl und unten Wasser. Die Bildhelligkeit allein legt diese Zuordnung nicht fest.
+Der Datensatz enthält ausschließlich Magnituden und direkte Phasen der Dual- und Triple-Echo-Aufnahmen. Die Wasser-/Öl-Zuordnung erfolgt anhand der bekannten Befüllung und dokumentierten Lagerung, bei den Beispieldaten oben Öl und unten Wasser. Die Bildhelligkeit allein legt diese Zuordnung nicht fest; auch die neutrale Farbansicht ist keine Stoffkennzeichnung.
 
-Die aktuelle Notebook-Aufgabe verwendet die Dual-Echo-Aufnahme ohne Knopf. `phasenreferenz.json` enthält den für diese vier Bilder vorgegebenen globalen Phasenbezug, bestimmt an bekanntem Wasser. Dateiprüfsummen und die OP-/IP-Zuordnung verhindern, dass dieser Bezug versehentlich für eine andere Aufnahme verwendet wird. Er korrigiert keine räumlichen Feldunterschiede. Für andere Messungen ist eine passende Referenz von der Betreuung erforderlich.
+Die aktuelle Notebook-Aufgabe startet mit der Dual-Echo-Aufnahme ohne Knopf. Für den Phasen-Magnitude-Blend werden nur die Magnituden und Phasen der beiden Echos benötigt. Rot und Blau kennzeichnen Phasenlagen, ohne feste Wasser-/Öl-Zuordnung. Die Magnitudenrechnung liefert größere und kleinere Modellanteile A/B. Zusätzliche Kalibrierdateien sind nicht erforderlich.
 
 ## Ursprüngliche Dateien zuordnen
 

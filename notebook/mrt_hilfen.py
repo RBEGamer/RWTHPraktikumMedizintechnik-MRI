@@ -390,29 +390,6 @@ def feldkarte(data, mask, meta, titel, grenze=.6):
     return bild(np.ma.masked_where(~mask, data), titel, meta, (-grenze, grenze), 'RdBu_r', bounds)
 
 
-def phasenreferenz_laden(datei, metadaten):
-    """Vorgegebenen Phasenbezug nur auf den zugehörigen Datensatz anwenden."""
-    import hashlib
-    import json
-
-    referenz = json.loads(Path(datei).read_text(encoding='utf-8'))
-    erwartet = referenz['dateien_sha256']
-    if (Path(metadaten[0]['datei']).name != referenz['op_magnitude']
-            or Path(metadaten[1]['datei']).name != referenz['ip_magnitude']):
-        raise ValueError('Die OP-/IP-Zuordnung passt nicht zur Phasenreferenz.')
-    if {Path(m['datei']).name for m in metadaten} != set(erwartet):
-        raise ValueError('Die Phasenreferenz gehört zu anderen Bildern. '
-                         'Für eigene Aufnahmen eine passende Referenz von der Betreuung verwenden.')
-    for meta in metadaten:
-        path = Path(meta['datei'])
-        if hashlib.sha256(path.read_bytes()).hexdigest() != erwartet[path.name]:
-            raise ValueError('Bilddatei passt nicht zur Phasenreferenz: ' + path.name)
-    phase = float(referenz['phase_op_minus_ip_rad'])
-    if not np.isfinite(phase):
-        raise ValueError('Die Referenzphase muss endlich sein.')
-    return phase
-
-
 def phasenblend_anzeigen(rgb, meta):
     """Bereits im Notebook berechnete RGB-Werte anzeigen; keine Farbrechnung."""
     from matplotlib.patches import Patch
@@ -421,31 +398,31 @@ def phasenblend_anzeigen(rgb, meta):
     ax.imshow(rgb, extent=_extent(meta, rgb.shape[:2]), interpolation='nearest')
     ax.set(title='Phase als Farbe · Magnitude als Helligkeit',
            xlabel='x in Schichtebene [mm]', ylabel='y in Schichtebene [mm]')
-    ax.legend(handles=[Patch(color='red', label='öltypische Phasenlage'),
-                       Patch(color='blue', label='wassertypische Phasenlage'),
+    ax.legend(handles=[Patch(color='red', label='Phasendifferenz nahe ±π'),
+                       Patch(color='blue', label='Phasendifferenz nahe 0'),
                        Patch(color='.6', label='Phase nicht auswertbar')],
               loc='upper center', bbox_to_anchor=(.5, -.11), ncol=2, frameon=False)
-    fig.supxlabel('Global phasenreferenziert · keine räumliche B₀-Korrektur\n'
-                  'Farbgewichte sind keine gemessenen Wasser-/Fettanteile', fontsize=9)
+    fig.supxlabel('Farbe: gemessene Phasenlage · Helligkeit: IP-Magnitude\n'
+                  'Rot und Blau haben keine feste Wasser-/Öl-Bedeutung', fontsize=9)
     plt.show()
     return fig
 
 
-def signalanteile_anzeigen(wasser, fett, fett_prozent, maske, meta):
+def signalanteile_anzeigen(anteil_a, anteil_b, b_prozent, maske, meta):
     """Berechnete Signale und pixelweise Prozentkarte zeigen; keine Trennung."""
     from matplotlib.patches import Patch
 
     fig, axes = plt.subplots(1, 3, figsize=(15, 5.5), constrained_layout=True)
-    lim = fenster(wasser[maske], fett[maske])[1]
+    lim = fenster(anteil_a[maske], anteil_b[maske])[1]
     for ax, data, title, cmap, vmax in zip(
-            axes, [wasser, fett, fett_prozent],
-            ['Wassersignal (Modell)', 'Fett-/Ölsignal (Modell)', 'Fett-Signalanteil (Modell) [%]'],
-            ['Blues', 'Reds', 'RdBu_r'], [lim, lim, 100]):
+            axes, [anteil_a, anteil_b, b_prozent],
+            ['Größerer Modellanteil A', 'Kleinerer Modellanteil B', 'Signalanteil B [%]'],
+            ['Blues', 'Reds', 'viridis'], [lim, lim, 50]):
         ax.set_facecolor('#e8edf2')
         im = ax.imshow(np.ma.masked_where(~maske, data), cmap=cmap, vmin=0, vmax=vmax,
                        extent=_extent(meta, data.shape))
         prozentkarte = ax is axes[2]
-        kritisch = maske & ((data < 0) | (data > 100)) if prozentkarte else maske & (data < 0)
+        kritisch = maske & ((data < 0) | (data > 50)) if prozentkarte else maske & (data < 0)
         ax.imshow(np.ma.masked_where(~kritisch, np.ones_like(data)),
                   cmap=ListedColormap(['#f4a340']), vmin=0, vmax=1,
                   extent=_extent(meta, data.shape))
@@ -454,7 +431,7 @@ def signalanteile_anzeigen(wasser, fett, fett_prozent, maske, meta):
     fig.legend(handles=[Patch(color='#f4a340', label='Orange: Modellgrenze verletzt'),
                         Patch(color='#e8edf2', label='Hellgrau: nicht ausgewertet')],
                loc='outside lower center', ncol=2, frameon=False)
-    fig.suptitle('Pixelweise Signalanteile · keine Stoffkonzentration oder PDFF', fontsize=13)
+    fig.suptitle('Modellanteile A und B · Wasser-/Fett-Zuordnung offen', fontsize=13)
     plt.show()
     return fig
 

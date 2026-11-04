@@ -4,7 +4,7 @@ Sie untersuchen eine Wasser-/Ölflasche auf einer Schichtebene. Datenimport und 
 
 1. Die relative Phase zwischen OP- und IP-Echo berechnen.
 2. Daraus ein Gesamtbild erzeugen: **Phase als Farbe, Magnitude als Helligkeit**.
-3. Näherungsweise Wasser-/Fett-Signale und den Fett-Signalanteil **für jedes gültige Pixel** berechnen.
+3. Aus den Magnituden den größeren Modellanteil A, den kleineren Modellanteil B und den Signalanteil B **für jedes gültige Pixel** berechnen.
 4. Aus der Phasendifferenz zwischen Echo 1 und Echo 3 der Triple-Echo-Aufnahme eine **B₀-Frequenzkarte in Hz** berechnen.
 
 Die automatische Signalmaske legt für die Signalanteile fest, welche Pixel auswertbar sind. Die B₀-Karte zeigt die ganze Schicht **ohne Maske und ohne räumliches Entfalten**; der signalarme Hintergrund ist dort verrauscht. Es müssen keine Bildbereiche mit Reglern gewählt werden.
@@ -25,7 +25,7 @@ Wenn das JupyterHub-Profil mit dem [Dockerfile dieses Repositorys](../Dockerfile
 
 ## Aufgaben bearbeiten
 
-Arbeiten Sie von oben nach unten mit **Shift + Enter**. Nur die vier als Aufgaben markierten Rechenblöcke enthalten `...`. Ersetzen Sie alle Platzhalter im jeweiligen Block, bevor Sie ihn ausführen. Die Formeln und kurze Python-Hilfen stehen direkt darüber.
+Arbeiten Sie von oben nach unten mit **Shift + Enter**. Ergänzen Sie die mit `...` markierten Rechenschritte und Darstellungsaufrufe. Dazu gehören auch das Auslesen der Echozeiten und die Auswahl der Triple-Echo-Aufnahme. Ersetzen Sie alle Platzhalter im jeweiligen Block, bevor Sie ihn ausführen. Die Formeln und kurze Python-Hilfen stehen direkt darüber.
 
 Die erste Aufnahme und die passenden Echos sind voreingestellt. Magnitude und Phase beider Echos werden in vier einzelnen Darstellungszellen geplottet. Nach einer Änderung der Echoauswahl müssen Sie die nachfolgenden Zellen erneut ausführen. Die Auswahlfelder funktionieren in einem laufenden Notebook, nicht in einer reinen Dateivorschau.
 
@@ -33,17 +33,17 @@ Für Kurzantworten doppelklicken Sie auf die Textzelle und schließen sie mit **
 
 ## Bilder richtig lesen
 
-IP enthält Wasser- **und** Fettsignal. Die rote/blaue Farbe zeigt eine relative Phasenlage; sie ist noch kein gemessener Fettanteil. Erst die anschließende Modellrechnung verwendet zusätzlich beide Magnituden für eine pixelweise Prozentkarte.
+IP enthält Wasser- **und** Fettsignal. Rot und Blau zeigen ausschließlich die gemessene OP-/IP-Phasendifferenz: nahe 0 wird blau, nahe ±π rot. Eine feste Zuordnung „Rot = Öl, Blau = Wasser“ wird nicht vorgenommen. Die Darstellung benötigt keine zusätzliche Kalibrierdatei.
 
-Auch diese Prozentwerte sind **keine Stoffkonzentrationen oder exakten Volumenanteile**. Der vorgegebene globale Phasenbezug korrigiert keine räumlichen Feldunterschiede. Die Aufgaben erklären, woran Sie diese Grenzen erkennen.
+Die Signalanteile werden unabhängig von den Farben aus beiden Magnituden berechnet: A ist im idealen Modell der größere, B der kleinere Beitrag. Die Prozentkarte zeigt B/(A+B). A und B können ohne zusätzliches Wissen nicht eindeutig Wasser und Fett zugeordnet werden; die Prozentwerte sind keine Stoffkonzentrationen oder Volumenanteile.
 
-Für die B₀-Karte sollte die chemische Phasendifferenz der äußeren Triple-Echos ungefähr null modulo 2π sein. Die zusätzliche gemessene Phasendifferenz liefert über den tatsächlichen Echoabstand die Frequenzabweichung. Ohne Entfalten bleiben die Werte modulo 1/ΔTE bestimmt; Sprünge können Phasenumbrüche sein. Diese einfache Frequenzkarte benötigt keine `phasenreferenz.json`.
+Für die B₀-Karte sollte die chemische Phasendifferenz der äußeren Triple-Echos ungefähr null modulo 2π sein. Die zusätzliche gemessene Phasendifferenz liefert über den tatsächlichen Echoabstand die Frequenzabweichung. Ohne Entfalten bleiben die Werte modulo 1/ΔTE bestimmt; Sprünge können Phasenumbrüche sein.
 
 ## Eigene Daten
 
 Laden Sie die DICOM-Dateien unter `daten/eigene/` hoch. Benötigt werden Magnitude und Phase beider Echos auf derselben Schichtebene. Ersetzen Sie in der Ladezelle den Datenordner, die Referenzdatei und die Aufnahme.
 
-Für Ihre Messung benötigen Sie außerdem einen passenden globalen Phasenbezug von der Betreuung. Die Datei [`phasenreferenz.json`](daten/beispiel/phasenreferenz.json) gilt nur für die zugehörigen vier Beispielbilder. Ihr Bezug darf nicht auf andere Messungen übertragen werden; die Zuordnung wird beim Import geprüft.
+Eine zusätzliche Referenzdatei zur Phasenkalibrierung ist nicht erforderlich. Der DICOM-Import prüft weiterhin Aufnahme, Echozeit, Geometrie und Phaseneinheit. Die neutrale Farbansicht funktioniert auch bei anderen Dateinamen, Aufnahmebezeichnungen und gedrehten Flaschenbildern.
 
 Für B₀ werden zusätzlich die äußeren Phasenbilder Ihrer Triple-Echo-Aufnahme benötigt. Die Farbformel hängt nicht von der Bilddrehung ab. Folgen Sie den genauen Importhinweisen am Notebookende. Die [Dateiübersicht](daten/beispiel/README.md) erklärt die 20 mitgelieferten Beispielbilder.
 
@@ -51,8 +51,8 @@ Für B₀ werden zusätzlich die äußeren Phasenbilder Ihrer Triple-Echo-Aufnah
 
 Speichern Sie Ihr Notebook mit den sichtbaren Eingangsbildern, dem Farbbild, den Signalanteilkarten, der B₀-Frequenzkarte und Ihren drei Kurzantworten. Die Abbildungen und Zahlen bleiben direkt in den Zellenausgaben erhalten; geben Sie das gespeicherte Notebook ab.
 
-[`experiment_loesung.ipynb`](experiment_loesung.ipynb) enthält die vollständige Musterlösung. Ihre **18 Codezellen** wurden mit den Beispieldaten unter Python 3.12 fehlerfrei ausgeführt. Die berechneten Ergebnisse und Abbildungen sind direkt im Lösungsnotebook sichtbar.
+[`experiment_loesung.ipynb`](experiment_loesung.ipynb) enthält die vollständige Musterlösung zur aktuellen Aufgabenfassung mit zusätzlichen Codekommentaren. Ihre **18 Codezellen** wurden mit den Beispieldaten unter Python 3.12 fehlerfrei ausgeführt. Die berechneten Ergebnisse und Abbildungen sind direkt im Lösungsnotebook sichtbar.
 
 ## Bei Fehlern
 
-Prüfen Sie zuerst, ob alle vorherigen Zellen ausgeführt und alle `...` im aktuellen Aufgabenblock ersetzt wurden. Bei „Datei nicht gefunden“ kontrollieren Sie die Pfade; Notebook, `mrt_hilfen.py`, Datenordner und Referenzdatei müssen zusammen verfügbar sein. Bei einer unpassenden Phasenreferenz verwenden Sie die zur Messung gehörende Datei der Betreuung. Zeigen Sie bei weiteren Problemen die vollständige Fehlermeldung.
+Prüfen Sie zuerst, ob alle vorherigen Zellen ausgeführt und alle `...` im aktuellen Aufgabenblock ersetzt wurden. Bei „Datei nicht gefunden“ kontrollieren Sie die Pfade; Notebook, `mrt_hilfen.py`, Datenordner und Referenzdatei müssen zusammen verfügbar sein. Zeigen Sie bei weiteren Problemen die vollständige Fehlermeldung.
