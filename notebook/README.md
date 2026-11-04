@@ -1,9 +1,40 @@
-# Jupyther Notebook zum MR-Praktikum
+# Jupyter-Notebook zum MR-Praktikum
 
 In diesem Praktikum untersuchen Sie eine mit Wasser und Öl gefüllte Flasche. Sie laden MRT-Bilder, vergleichen zwei Echos und werten einen Wasser- und einen Ölbereich aus. Alle Aufgaben beziehen sich auf **eine Schichtebene**. Die optionale Zusatzaufgabe behandelt die lokale Magnetfeldabweichung B₀.
 Die benötigten Schritte werden im Notebook erklärt.
 
 Die Scan-Anleitung zeigt, welche MRT-Aufnahmen Sie benötigen, wie Sie die gemeinsame Schichtebene planen und welche DICOM-Bilder Sie exportieren sollen.
+
+## Einmalige Vorbereitung auf JupyterHub
+
+Wenn Ihr JupyterHub-Profil mit dem [Dockerfile dieses Repositorys](../Dockerfile) gebaut wurde, sind die Bibliotheken bereits installiert. Wählen Sie **Python 3 (MRT-Praktikum)** und beginnen Sie mit Abschnitt 1. Das Bauen und Bereitstellen des Images ist in der [Repository-Übersicht](../README.md#docker-image-für-jupyterhub) beschrieben.
+
+Ein Git-Klon enthält die Dateien, aber installiert die benötigten Python-Bibliotheken noch nicht. Öffnen Sie `experiment.ipynb` im Ordner `notebook/` und wählen Sie einen verfügbaren Python-3-Kernel. Der Name **Python 3 (MRT-Praktikum)** ist dafür nicht erforderlich.
+
+Fügen Sie vorübergehend eine neue Codezelle ein und führen Sie sie aus:
+
+```python
+%pip install -r requirements-jupyterhub.txt
+```
+
+Diese Paketliste enthält die Bibliotheken für die Auswertung. Die JupyterHub-Oberfläche und der bereits vorhandene Kernel werden darüber nicht neu installiert. `%pip` installiert in der Umgebung des aktuell ausgewählten Kernels ([IPython-Dokumentation](https://ipython.readthedocs.io/en/stable/interactive/magics.html#magic-pip)).
+
+Falls die zusätzliche Paketliste im bereits geklonten Stand noch fehlt, verwenden Sie direkt:
+
+```python
+%pip install numpy matplotlib pydicom scipy scikit-image ipywidgets
+```
+
+Warten Sie das Ende der Installation ab. Starten Sie anschließend über **Kernel → Restart Kernel…** den Kernel neu und beginnen Sie wieder mit der ersten Codezelle des Experiments. Die temporäre Installationszelle können Sie danach entfernen.
+
+Zum Prüfen der Installation können Sie eine Codezelle mit den folgenden Importen ausführen:
+
+```python
+import numpy, matplotlib, pydicom, scipy, skimage, ipywidgets
+print("Bibliotheken sind verfügbar.")
+```
+
+Falls beim Installieren ein Fehler auftritt, halten Sie die vollständige Fehlermeldung sowie die Ausgabe von `import sys; print(sys.version)` fest. Falls die Imports funktionieren, aber die Regler nicht angezeigt werden, muss bei getrennten Server- und Kernel-Umgebungen gegebenenfalls die Widget-Unterstützung im JupyterHub durch die Betreuung eingerichtet werden ([Jupyter-Widgets-Dokumentation](https://ipywidgets.readthedocs.io/en/stable/user_install.html#installing-in-jupyterlab)).
 
 ## 1. Notebook öffnen
 
@@ -11,7 +42,7 @@ Die Arbeitsumgebung ist am Praktikumsrechner vorbereitet.
 
 1. Öffnen Sie die bereitgestellte **JupyterLab-Umgebung** und wechseln Sie in Ihren Arbeitsordner.
 2. Öffnen Sie dort **[`experiment.ipynb`](experiment.ipynb)** per Doppelklick.
-3. Falls eine Kernel-Auswahl erscheint, wählen Sie **Python 3 (MRT-Praktikum)**. Der Kernel führt Ihre Codezellen aus.
+3. Falls eine Kernel-Auswahl erscheint, wählen Sie den bereitgestellten **Python-3-Kernel**, gegebenenfalls **Python 3 (MRT-Praktikum)**. Der Kernel führt Ihre Codezellen aus.
 4. Speichern Sie über **File → Save Notebook As…** eine eigene Fassung, beispielsweise `experiment3_bearbeitet.ipynb`, **im selben Ordner**.
 5. Klicken Sie in die erste Codezelle und drücken Sie **Shift + Enter**. Diese Zelle lädt bereits das erste DICOM-Bild.
 

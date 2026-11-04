@@ -1,0 +1,9 @@
+# Bibliotheken für das Notebook in einem vorhandenen JupyterHub-Python-Kernel.
+# pip wählt zur Python-Version des aktiven Kernels passende Paketversionen.
+# Installation aus einer Notebook-Zelle: %pip install -r requirements-jupyterhub.txt
+numpy
+matplotlib
+pydicom
+scipy
+scikit-image
+ipywidgets

@@ -1,0 +1,5 @@
+# Für den Image-Bau wird nur die Paketliste benötigt.
+**
+!Dockerfile
+!notebook/
+!notebook/requirements-jupyterhub.txt
