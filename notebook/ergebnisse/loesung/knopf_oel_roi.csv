@@ -1,0 +1,2 @@
+aufnahme,datei_1,datei_2,te_1_ms,te_2_ms,referenz_mhz,position_mm,roi_zeilen_spalten,pixel,flaeche_mm2,fett_unter_F_ge_W_prozent,negativ_prozent
+T1W_FFE dual echo button,wasser_oel_mit_knopf_dual_echo1_magnitude.dcm,wasser_oel_mit_knopf_dual_echo2_magnitude.dcm,6.901,13.8,63.889596,-64.873046875;-2.8314272238276;56.3306689580204,"(100, 160, 120, 170)",2986,192.50259399414062,91.70773446200371,20.16075016744809
