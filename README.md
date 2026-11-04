@@ -1,45 +1,82 @@
-# Medizintechnik-Praktikum · Magnetresonanztomographie
+Copyright (C) 2020 by RWTH Aachen University
 
-Dieses Repository enthält die Unterlagen zum Versuch **Magnetresonanztomographie (MRT)** im Medizintechnik-Praktikum. Dazu gehören das Versuchsskript, eine bebilderte Scan-Anleitung, die vorbereitete Philips-ExamCard und ein Jupyter-Notebook mit DICOM-Beispieldaten zur Auswertung.
+[http://www.rwth-aachen.de](http://www.rwth-aachen.de)
 
-## Unterlagen
+License:
 
-| Unterlage | Inhalt |
+This software is dual-licensed under:
+
+- Commercial license (please contact: [lfb@lfb.rwth-aachen.de](mailto:lfb@lfb.rwth-aachen.de))
+- [AGPL (GNU Affero General Public License)](LICENSE.txt) open source license
+
+# MRI Laboratory
+
+Welcome to the Magnetic Resonance Imaging (MRI) experiment of the Medical Engineering Laboratory at the Institute of Imaging and Computer Vision, RWTH Aachen University.
+
+This repository contains the course materials for the experiment, including the preparation script, an illustrated scan guide, a Philips ExamCard, and a Jupyter notebook with DICOM example data. The course materials and notebook instructions are provided in German.
+
+During the experiment, you investigate a water/oil phantom, plan MRI acquisitions, explore imaging parameters, and determine the frequency difference between water and fat. You then compare dual- and triple-echo acquisitions and implement a simple Dixon analysis in the notebook. An optional exercise introduces an approximate B₀ field map.
+
+Work through the preparation script before the laboratory session. Use the scan guide during the measurements, then practise the analysis with the [Jupyter notebook](notebook/experiment.ipynb).
+
+## Course materials
+
+| Material | Description |
 | --- | --- |
-| [Versuchsskript](dokumentation/Versuchsskript/Versuchsskript.pdf) | Grundlagen und Aufgaben zum Versuch Magnetresonanztomographie. |
-| [Scan-Anleitung (PDF)](dokumentation/Versuchsdurchfuehrung/Versuchsdurchfuehrung.pdf) | Versuchsaufbau, Bedienung des Scanners, Messablauf und DICOM-Export. Die [LaTeX-Quelle](dokumentation/Versuchsdurchfuehrung/Versuchsdurchfuehrung.tex) liegt im selben Ordner. |
-| [Philips-ExamCard](dokumentation/MRSequenzExamCard/LfB_MR_Praktikum.ExamCard) | Vorbereitete Messsequenzen für das MRT-Praktikum. |
-| [Jupyter-Notebook](notebook/experiment.ipynb) | Aufgaben zur einfachen Dixon-Auswertung und zur optionalen näherungsweisen B₀-Karte. |
-| [DICOM-Beispieldaten](notebook/daten/beispiel/README.md) | Magnituden- und Phasenbilder einer gemeinsamen Schichtebene, jeweils mit und ohne Metallknopf. |
+| [Preparation script](dokumentation/Versuchsskript/Versuchsskript.pdf) | Background and exercises for the MRI experiment. |
+| [Scan guide](dokumentation/Versuchsdurchfuehrung/Versuchsdurchfuehrung.pdf) | Scanner operation, acquisition planning, measurements, and DICOM export. The [LaTeX source](dokumentation/Versuchsdurchfuehrung/Versuchsdurchfuehrung.tex) is included. |
+| [Philips ExamCard](dokumentation/MRSequenzExamCard/LfB_MR_Praktikum.ExamCard) | Prepared measurement sequences. |
+| [Jupyter notebook](notebook/experiment.ipynb) | Dixon analysis and the optional B₀ exercise. See the [notebook instructions](notebook/README.md) for details. |
+| [DICOM example data](notebook/daten/beispiel/README.md) | Magnitude and phase images of one slice, with and without the metal button. |
 
-## Versuch und Auswertung
+## How to run the coding exercises locally?
 
-Im Praktikum untersuchen Sie unter anderem eine mit Wasser und Öl gefüllte Flasche. Sie planen die Aufnahmen, untersuchen den Einfluss von Messparametern und bestimmen den Frequenzabstand zwischen Wasser und Fett. Anschließend vergleichen Sie die Echos und werten die Wasser- und Ölbereiche im Notebook aus. Eine optionale Zusatzaufgabe behandelt die lokale Magnetfeldabweichung B₀.
+The following commands use Bash syntax. Run them from the root directory of your local copy of this repository.
 
-## Einstieg
+1. Install [Docker](https://www.docker.com/).
 
-1. Lesen Sie das Versuchsskript zur Vorbereitung.
-2. Verwenden Sie die Scan-Anleitung für die Durchführung der Messungen mit der Betreuung.
-3. Öffnen Sie zur Auswertung das Jupyter-Notebook. Die [Startanleitung zum Notebook](notebook/README.md) erklärt die Bedienung und die Verwendung eigener Messdaten.
+2. Clone this repository and open a terminal in its root directory.
 
-Für einen vorhandenen JupyterHub-Kernel verwenden Sie [notebook/requirements-jupyterhub.txt](notebook/requirements-jupyterhub.txt). Die [JupyterHub-Einrichtung](notebook/README.md#einmalige-vorbereitung-auf-jupyterhub) erklärt die einmalige Installation im Notebook. Die vollständige Paketliste für eine separat eingerichtete Arbeitsumgebung steht in [notebook/requirements.txt](notebook/requirements.txt).
+3. Build the image for the MRI experiment using the included [Dockerfile](Dockerfile):
 
-Das Notebook benötigt die Hilfsdatei `mrt_hilfen.py` und den Unterordner `daten` neben sich; behalten Sie diese Ordnerstruktur beim Kopieren bei.
+   ```bash
+   docker build -t mrt-praktikum .
+   ```
 
-## Docker-Image für JupyterHub
+   The image installs the required libraries and registers the kernel **Python 3 (MRT-Praktikum)**. If the RWTH registry returns `403 Forbidden` when downloading the base image, sign in with an account authorised to access it and repeat the build:
 
-Das [Dockerfile](Dockerfile) erweitert das RWTH-Image `rwth-courses` um die benötigten MRT-Bibliotheken aus [notebook/requirements-jupyterhub.txt](notebook/requirements-jupyterhub.txt). Es registriert den Kernel **Python 3 (MRT-Praktikum)** und prüft die Bibliotheksimporte beim Image-Bau.
+   ```bash
+   docker login registry.git.rwth-aachen.de
+   ```
 
-Das Image aus dem Hauptordner dieses Repositorys bauen:
+4. Start the container and mount your local repository so that your work is saved on your computer:
 
-```bash
-docker build -t mrt-praktikum .
-```
+   ```bash
+   docker run --rm -it --name mrt-praktikum \
+     -p 127.0.0.1:8888:8888 \
+     --mount "type=bind,source=$(pwd),target=/srv/mrt-praktikum" \
+     --workdir /srv/mrt-praktikum \
+     --entrypoint jupyter \
+     mrt-praktikum lab --ip=0.0.0.0 --port=8888 --no-browser \
+     --ServerApp.root_dir=/srv/mrt-praktikum
+   ```
 
-Falls die RWTH-Registry den Abruf des Basis-Images mit `403 Forbidden` verweigert, melden Sie sich mit einem für dieses Image berechtigten Konto an und wiederholen Sie den Bau:
+5. Open [http://localhost:8888](http://localhost:8888) in your browser. Follow the access instructions printed in the terminal; if a token is requested, use the token shown there. Open `notebook/experiment.ipynb`, select **Python 3 (MRT-Praktikum)**, and save your own working copy. Changes to files under the mounted repository are saved on your computer.
 
-```bash
-docker login registry.git.rwth-aachen.de
-```
+6. When you are finished, save your notebook and stop the container from another terminal:
 
-Ein anderes Basis-Image kann über `--build-arg BASE_IMAGE=...` gewählt werden. Für die Verwendung auf JupyterHub muss das gebaute Image in der vorgesehenen Registry bereitgestellt und als JupyterHub-Profil eingerichtet werden. Starten Sie anschließend einen Server mit diesem Profil und wählen Sie im Notebook **Python 3 (MRT-Praktikum)**. Die Unterlagen können Sie dort per Git klonen.
+   ```bash
+   docker stop mrt-praktikum
+   ```
+
+   The container is removed after it stops; your files remain in the local repository folder.
+
+**Note:** The local container workflow has not yet been verified with the RWTH base image because the registry denied the anonymous image download. Access to the base image is required to build it. The runtime options are documented in the [Docker reference](https://docs.docker.com/reference/cli/docker/container/run/).
+
+## How to run the coding exercises on JupyterHub?
+
+If your JupyterHub profile uses the image built from this repository, select **Python 3 (MRT-Praktikum)** and open the notebook. The image must first be built, published to the appropriate registry, and configured as a JupyterHub profile by the course administrators.
+
+For an existing Python kernel, follow the [JupyterHub setup instructions](notebook/README.md#einmalige-vorbereitung-auf-jupyterhub). The required analysis libraries are listed in [notebook/requirements-jupyterhub.txt](notebook/requirements-jupyterhub.txt); [notebook/requirements.txt](notebook/requirements.txt) contains the full version-pinned environment list.
+
+Keep `mrt_hilfen.py` and the `daten` directory next to the notebook when copying the materials.
