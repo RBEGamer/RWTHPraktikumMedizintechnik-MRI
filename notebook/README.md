@@ -7,11 +7,11 @@ Die Scan-Anleitung zeigt, welche MRT-Aufnahmen Sie benötigen, wie Sie die gemei
 
 ## Einmalige Vorbereitung auf JupyterHub
 
-Wenn Ihr JupyterHub-Profil mit dem [Dockerfile dieses Repositorys](../Dockerfile) gebaut wurde, sind die Bibliotheken bereits installiert. Wählen Sie **Python 3 (MRT-Praktikum)** und beginnen Sie mit Abschnitt 1. Das Bauen und Bereitstellen des Images ist in der [Repository-Übersicht](../README.md#docker-image-für-jupyterhub) beschrieben.
+Wenn Ihr JupyterHub-Profil mit dem [Dockerfile dieses Repositorys](../Dockerfile) gebaut wurde, sind die Bibliotheken bereits installiert. Wählen Sie **Python 3 (MRT-Praktikum)** und beginnen Sie mit Abschnitt 1. Das Bauen und Bereitstellen des Images ist in der [Repository-Übersicht](../README.md#how-to-run-the-coding-exercises-locally) beschrieben.
 
 Ein Git-Klon enthält die Dateien, aber installiert die benötigten Python-Bibliotheken noch nicht. Öffnen Sie `experiment.ipynb` im Ordner `notebook/` und wählen Sie einen verfügbaren Python-3-Kernel. Der Name **Python 3 (MRT-Praktikum)** ist dafür nicht erforderlich.
 
-Fügen Sie vorübergehend eine neue Codezelle ein und führen Sie sie aus:
+Die erste Codezelle des Notebooks installiert die benötigten Bibliotheken. Führen Sie diese Zelle in Schritt 0 aus:
 
 ```python
 %pip install -r requirements-jupyterhub.txt
@@ -25,7 +25,7 @@ Falls die zusätzliche Paketliste im bereits geklonten Stand noch fehlt, verwend
 %pip install numpy matplotlib pydicom scipy scikit-image ipywidgets
 ```
 
-Warten Sie das Ende der Installation ab. Starten Sie anschließend über **Kernel → Restart Kernel…** den Kernel neu und beginnen Sie wieder mit der ersten Codezelle des Experiments. Die temporäre Installationszelle können Sie danach entfernen.
+Warten Sie das Ende der Installation ab. Starten Sie anschließend über **Kernel → Restart Kernel…** den Kernel neu und fahren Sie mit **Schritt 1 · Eine DICOM-Datei laden** fort. Wenn die Bibliotheken bereits installiert sind, können Sie Schritt 0 überspringen.
 
 Zum Prüfen der Installation können Sie eine Codezelle mit den folgenden Importen ausführen:
 
@@ -44,7 +44,7 @@ Die Arbeitsumgebung ist am Praktikumsrechner vorbereitet.
 2. Öffnen Sie dort **[`experiment.ipynb`](experiment.ipynb)** per Doppelklick.
 3. Falls eine Kernel-Auswahl erscheint, wählen Sie den bereitgestellten **Python-3-Kernel**, gegebenenfalls **Python 3 (MRT-Praktikum)**. Der Kernel führt Ihre Codezellen aus.
 4. Speichern Sie über **File → Save Notebook As…** eine eigene Fassung, beispielsweise `experiment3_bearbeitet.ipynb`, **im selben Ordner**.
-5. Klicken Sie in die erste Codezelle und drücken Sie **Shift + Enter**. Diese Zelle lädt bereits das erste DICOM-Bild.
+5. Führen Sie bei Bedarf zuerst die Installationszelle in Schritt 0 aus. Starten Sie danach den Kernel neu und laden Sie in Schritt 1 das erste DICOM-Bild.
 
 Der Ordner muss neben Ihrem Notebook die Datei `mrt_hilfen.py` und den Unterordner `daten` enthalten. Verschieben Sie das Notebook deshalb nicht einzeln. Wenn JupyterLab oder der passende Kernel fehlt, wenden Sie sich an die Betreuung.
 
