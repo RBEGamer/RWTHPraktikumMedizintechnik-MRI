@@ -1,61 +1,25 @@
-# Startanleitung für Studierende · MRT-Praktikum
+# Medizintechnik-Praktikum · Magnetresonanztomographie
 
-In diesem Praktikum untersuchen Sie eine mit Wasser und Öl gefüllte Flasche. Sie laden MRT-Bilder, vergleichen zwei Echos und werten einen Wasser- und einen Ölbereich aus. Alle Aufgaben beziehen sich auf **eine Schichtebene**. Die optionale Zusatzaufgabe behandelt die lokale Magnetfeldabweichung B₀.
+Dieses Repository enthält die Unterlagen zum Versuch **Magnetresonanztomographie (MRT)** im Medizintechnik-Praktikum. Dazu gehören das Versuchsskript, eine bebilderte Scan-Anleitung, die vorbereitete Philips-ExamCard und ein Jupyter-Notebook mit DICOM-Beispieldaten zur Auswertung.
 
-Python-Vorkenntnisse sind nicht erforderlich; die benötigten Schritte werden im Notebook erklärt.
+## Unterlagen
 
-Die [Scan-Anleitung für Studierende](output/pdf/scan_anleitung.pdf) zeigt, welche MRT-Aufnahmen Sie benötigen, wie Sie die gemeinsame Schichtebene planen und welche DICOM-Bilder Sie exportieren sollen.
+| Unterlage | Inhalt |
+| --- | --- |
+| [Versuchsskript](<dokumentation/Versuchsskript Bildgebende Verfahren - Magnetresonanztomographie.pdf>) | Grundlagen und Aufgaben zum Versuch Magnetresonanztomographie. |
+| [Scan-Anleitung (PDF)](dokumentation/MRT_Scananleitung/scan_anleitung.pdf) | Versuchsaufbau, Bedienung des Scanners, Messablauf und DICOM-Export. Die [LaTeX-Quelle](dokumentation/MRT_Scananleitung/scan_anleitung.tex) liegt im selben Ordner. |
+| [Philips-ExamCard](dokumentation/philips_ambition_ExamCard/LfB_MR_Praktikum.ExamCard) | Vorbereitete Messsequenzen für das MRT-Praktikum. |
+| [Jupyter-Notebook](notebook/experiment.ipynb) | Aufgaben zur einfachen Dixon-Auswertung und zur optionalen näherungsweisen B₀-Karte. |
+| [DICOM-Beispieldaten](notebook/daten/beispiel/README.md) | Magnituden- und Phasenbilder einer gemeinsamen Schichtebene, jeweils mit und ohne Metallknopf. |
 
-## 1. Notebook öffnen
+## Versuch und Auswertung
 
-Die Arbeitsumgebung ist am Praktikumsrechner vorbereitet.
+Im Praktikum untersuchen Sie unter anderem eine mit Wasser und Öl gefüllte Flasche. Sie planen die Aufnahmen, untersuchen den Einfluss von Messparametern und bestimmen den Frequenzabstand zwischen Wasser und Fett. Anschließend vergleichen Sie die Echos und werten die Wasser- und Ölbereiche im Notebook aus. Eine optionale Zusatzaufgabe behandelt die lokale Magnetfeldabweichung B₀.
 
-1. Öffnen Sie die bereitgestellte **JupyterLab-Umgebung** und wechseln Sie in Ihren Arbeitsordner.
-2. Öffnen Sie **[`experiment.ipynb`](src/notebook/experiment.ipynb)** im Ordner `src/notebook/` per Doppelklick.
-3. Falls eine Kernel-Auswahl erscheint, wählen Sie **Python 3 (MRT-Praktikum)**. Der Kernel führt Ihre Codezellen aus.
-4. Speichern Sie über **File → Save Notebook As…** eine eigene Fassung, beispielsweise `experiment3_bearbeitet.ipynb`, **im selben Ordner**.
-5. Klicken Sie in die erste Codezelle und drücken Sie **Shift + Enter**. Diese Zelle lädt bereits das erste DICOM-Bild.
+## Einstieg
 
-Der Ordner muss neben Ihrem Notebook die Datei `mrt_hilfen.py` und den Unterordner `daten` enthalten. Verschieben Sie das Notebook deshalb nicht einzeln. Wenn JupyterLab oder der passende Kernel fehlt, wenden Sie sich an die Betreuung.
+1. Lesen Sie das Versuchsskript zur Vorbereitung.
+2. Verwenden Sie die Scan-Anleitung für die Durchführung der Messungen mit der Betreuung.
+3. Öffnen Sie zur Auswertung das Jupyter-Notebook. Die [Startanleitung zum Notebook](notebook/README.md) erklärt die Bedienung und die Verwendung eigener Messdaten.
 
-Die 20 DICOM-Beispieldateien unter `daten/beispiel/` sind nach Objektzustand, Aufnahme, Echo und Bildtyp benannt. Die [Dateiübersicht](src/notebook/daten/beispiel/README.md) erklärt die Benennung und die Zuordnung zu den ursprünglichen Exportnamen.
-
-## 2. Aufgaben bearbeiten
-
-- Lesen Sie jeweils die kurze Erklärung und führen Sie anschließend die zugehörige Codezelle mit **Shift + Enter** aus. Arbeiten Sie von oben nach unten.
-- Ersetzen Sie die markierten Stellen **`...`** durch Ihren Code. Eine noch offene Ergänzungsaufgabe kann eine Fehlermeldung auslösen.
-- Für schriftliche Antworten doppelklicken Sie auf das jeweilige Textfeld im Notebook. Tragen Sie Ihre Antwort ein und schließen Sie mit **Shift + Enter** ab.
-- Speichern Sie regelmäßig mit **Strg + S** beziehungsweise **⌘ + S**.
-
-Beginnen Sie mit den voreingestellten Beispieldaten. Die Echozeiten lesen Sie aus den DICOM-Dateien aus; die Aufgaben führen Sie durch die einzelnen Rechenschritte.
-
-## 3. Aufnahme und Bildbereich auswählen
-
-Die Auswahlfelder bestimmen die Aufnahme und die Echos. Mit den Schiebereglern wählen Sie eine **ROI**, also einen auszuwertenden Bildbereich. Die grüne Markierung zeigt die gültige Auswahl.
-
-**Nach einer Änderung müssen Sie die nachfolgenden Rechenzellen erneut ausführen.** Beim ROI-Regler beginnen Sie mit der Zelle, die die Auswahl übernimmt. Bereits berechnete Zahlen ändern sich durch das Verschieben des Reglers allein noch nicht.
-
-Die Regler funktionieren in einem laufenden Notebook. Eine reine Dateivorschau reicht dafür nicht aus.
-
-## 4. Eigene Messdaten verwenden
-
-Wechseln Sie erst beim Abschnitt **„Eigene Daten und kurze Diskussion“** zu Ihren eigenen Aufnahmen. Dort steht, welche Dateipfade und Auswahlfelder Sie ändern müssen. Legen Sie Ihre Exporte unter `daten/eigene/` ab und folgen Sie den Schritten im Notebook.
-
-Falls keine eigenen Daten vorliegen, verwenden Sie die im Notebook vorgeschlagene zweite Beispielaufnahme auf derselben Schichtebene.
-
-## 5. Ergebnisse abgeben
-
-Die Speicherzellen im Notebook legen Ihre Abbildungen und Ergebnistabellen unter `ergebnisse/` ab. Führen Sie diese Zellen nach Ihrer endgültigen Auswahl erneut aus.
-
-Prüfen Sie vor der Abgabe:
-
-- Ihr bearbeitetes Notebook ist gespeichert; Ihre Abbildungen, Zahlen und Kurzantworten sind sichtbar.
-- Aufnahme, tatsächliche Echozeiten sowie Wasser- und Öl-ROI sind dokumentiert.
-- Zu beiden Signalanteilen haben Sie die jeweilige Wasser/Fett-Zuordnung und die Grenzen der Auswertung erläutert.
-- Falls Sie die B₀-Aufgabe bearbeitet haben, sind auch deren Karten, Maske und Kennwerte enthalten.
-
-Geben Sie **Ihr bearbeitetes Notebook und die zugehörigen PNG- und CSV-Dateien aus `ergebnisse/`** nach den Vorgaben der Betreuung ab.
-
-## Wenn etwas nicht funktioniert
-
-Bei einer Fehlermeldung prüfen Sie zuerst, ob Sie die vorherigen Zellen ausgeführt und die erforderlichen `...` ersetzt haben. Bei „Datei nicht gefunden“ kontrollieren Sie den Pfad und den gemeinsamen Ordner von Notebook, Hilfsdatei und Daten. Wenn Sie nicht weiterkommen, zeigen Sie der Betreuung die betroffene Zelle und die Fehlermeldung.
+Die benötigten Python-Pakete sind in [notebook/requirements.txt](notebook/requirements.txt) aufgeführt. Das Notebook benötigt die Hilfsdatei `mrt_hilfen.py` und den Unterordner `daten` neben sich; behalten Sie diese Ordnerstruktur beim Kopieren bei.
