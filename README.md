@@ -11,12 +11,14 @@ Die [Scan-Anleitung für Studierende](output/pdf/scan_anleitung.pdf) zeigt, welc
 Die Arbeitsumgebung ist am Praktikumsrechner vorbereitet.
 
 1. Öffnen Sie die bereitgestellte **JupyterLab-Umgebung** und wechseln Sie in Ihren Arbeitsordner.
-2. Öffnen Sie dort **`experiment3_student.ipynb`** per Doppelklick.
+2. Öffnen Sie **[`experiment.ipynb`](src/notebook/experiment.ipynb)** im Ordner `src/notebook/` per Doppelklick.
 3. Falls eine Kernel-Auswahl erscheint, wählen Sie **Python 3 (MRT-Praktikum)**. Der Kernel führt Ihre Codezellen aus.
 4. Speichern Sie über **File → Save Notebook As…** eine eigene Fassung, beispielsweise `experiment3_bearbeitet.ipynb`, **im selben Ordner**.
 5. Klicken Sie in die erste Codezelle und drücken Sie **Shift + Enter**. Diese Zelle lädt bereits das erste DICOM-Bild.
 
 Der Ordner muss neben Ihrem Notebook die Datei `mrt_hilfen.py` und den Unterordner `daten` enthalten. Verschieben Sie das Notebook deshalb nicht einzeln. Wenn JupyterLab oder der passende Kernel fehlt, wenden Sie sich an die Betreuung.
+
+Die 20 DICOM-Beispieldateien unter `daten/beispiel/` sind nach Objektzustand, Aufnahme, Echo und Bildtyp benannt. Die [Dateiübersicht](src/notebook/daten/beispiel/README.md) erklärt die Benennung und die Zuordnung zu den ursprünglichen Exportnamen.
 
 ## 2. Aufgaben bearbeiten
 

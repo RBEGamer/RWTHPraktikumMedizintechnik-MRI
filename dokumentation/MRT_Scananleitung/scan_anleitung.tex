@@ -1,0 +1,371 @@
+% Kompilieren aus diesem Ordner: latexmk -pdf scan_anleitung.tex
+% Alternativ: pdflatex scan_anleitung.tex (zweimal).
+% Alle Fotos und Bildschirmaufnahmen liegen unter images/.
+% Ablauf: notes.txt; Echozeiten werden aus dem gemessenen Peakabstand berechnet.
+\documentclass[a4paper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{lmodern,microtype}
+\usepackage[margin=19mm,top=19mm,bottom=19mm,headheight=14pt]{geometry}
+\usepackage{graphicx,booktabs,tabularx,array,amsmath,amssymb}
+\usepackage[export]{adjustbox}
+\usepackage[table]{xcolor}
+\usepackage{enumitem,parskip,fancyhdr,lastpage}
+\usepackage[most]{tcolorbox}
+\usepackage[font=small,labelfont=bf,labelsep=colon,skip=4pt,hypcap=false,justification=raggedright,singlelinecheck=false]{caption}
+\usepackage[colorlinks=true,urlcolor=teal!65!black,linkcolor=teal!65!black]{hyperref}
+\graphicspath{{images/}}
+\definecolor{ink}{HTML}{15374A}
+\definecolor{accent}{HTML}{087E8B}
+\definecolor{pale}{HTML}{EEF5F7}
+\hypersetup{pdftitle={MRT-Scananleitung für das Praktikum},pdfauthor={},pdfsubject={Phantomaufbau, Scannerbedienung, Spektrum, Multi-Echo-Aufnahmen und DICOM-Export},pdfdisplaydoctitle=true}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\sffamily\color{ink}MRT-PRAKTIKUM}
+\fancyhead[R]{\small\sffamily Bedienung und Messablauf}
+\fancyfoot[L]{\small\color{ink}Phantommessungen\enspace|\enspace Scan-Anleitung}
+\fancyfoot[R]{\small\thepage\,/\,\pageref*{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{2em}
+\setlist[enumerate]{leftmargin=6mm,itemsep=4pt,topsep=4pt}
+\setlist[itemize]{leftmargin=5mm,itemsep=3pt,topsep=4pt}
+\renewcommand{\arraystretch}{1.16}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\heading}[3]{\pdfbookmark[0]{#3}{#1}\label{#1}\vspace*{1mm}{\sffamily\bfseries\color{accent}\small #2\par}\vspace{1mm}{\sffamily\bfseries\color{ink}\LARGE #3\par}\vspace{2mm}}
+\newcommand{\subhead}[1]{\par\vspace{2mm}{\sffamily\bfseries\color{ink}\large #1\par}\nopagebreak}
+\newcommand{\ui}[1]{\textsf{\textbf{#1}}}
+\newcommand{\seq}[1]{\texttt{#1}}
+\newcommand{\ms}{\,\mathrm{ms}}
+\newcommand{\blank}{\rule{20mm}{0.35pt}}
+\newtcolorbox{note}{colback=pale,colframe=accent!45,boxrule=.5pt,arc=1mm,left=3mm,right=3mm,top=2mm,bottom=2mm,before skip=6pt,after skip=6pt}
+% Relative Beschnitte sind unabhängig von den DPI. Originalbilder bleiben unverändert.
+\newcommand{\bild}[3][]{\par\noindent\begin{minipage}{\linewidth}\centering\adjincludegraphics[width=\linewidth,#1]{#2}\captionof{figure}{#3}\end{minipage}\par}
+
+\begin{document}
+
+\heading{registrierung}{01 / START UND REGISTRIERUNG}{MRT-Scananleitung}
+Diese Anleitung führt Sie vom Einrichten eines Phantomversuchs bis zum Export der Messdaten. Sie untersuchen Bildfeld und Flipwinkel, bestimmen den Wasser-Fett-Frequenzabstand und nehmen zwei sowie drei Echos auf. Die Dixon-Auswertung im Notebook vergleicht \textbf{eine gemeinsame Schichtebene}; die $B_0$-Auswertung ist optional.
+
+\begin{note}
+\textbf{Messfolge:} Phantom registrieren $\rightarrow$ Spule und Objekt aufbauen $\rightarrow$ Position einmessen $\rightarrow$ Survey aufnehmen $\rightarrow$ FOV und Flipwinkel untersuchen $\rightarrow$ Spektrum messen $\rightarrow$ zwei und drei Echos aufnehmen $\rightarrow$ Objektvarianten vergleichen $\rightarrow$ DICOM exportieren.
+\end{note}
+
+\subhead{Für jede Gruppe eine eigene Untersuchung anlegen}
+\begin{enumerate}
+\item Öffnen Sie nach dem Softwarestart \ui{Patients $\rightarrow$ New Examination\ldots} oder drücken Sie \ui{F2}.
+\item Tragen Sie unter \ui{Patient name} und \ui{Registration ID} eine eindeutige Gruppenkennung ein, z.\,B. \texttt{Praktikum1}. Verwenden Sie die mit der Betreuung vereinbarten Angaben für weitere Pflichtfelder.
+\item Wählen Sie unter \ui{Gender} den Typ \ui{Phantom} und tragen Sie unter \ui{Patient weight} \textbf{5\,kg} ein.
+\item Speichern und öffnen Sie die Untersuchung mit \ui{Confirm and Proceed}. Richten Sie danach den Versuchsaufbau auf dem Tisch ein.
+\end{enumerate}
+
+\noindent\begin{minipage}[t]{.35\linewidth}\vspace{0pt}
+\bild[trim={0\width} {.77\height} {.835\width} {0\height},clip]{NEW_PATIENT_1.png}{Neue Untersuchung im Menü \ui{Patients}.}
+\end{minipage}\hfill
+\begin{minipage}[t]{.61\linewidth}\vspace{0pt}
+\bild[trim={.105\width} {.63\height} {.63\width} {.167\height},clip]{NEW_PATIENT_2.png}{Gruppenkennung, \ui{Phantom} und \textbf{5\,kg} im Registrierungsdialog.}
+\end{minipage}
+
+\begin{note}
+\textbf{Aufbau mit der Betreuung:} Lassen Sie Spulenanschluss, Tischbewegungen und Messfreigabe vor Ort begleiten. Für den Versuch mit Metallknopf verwenden Sie ausschließlich das bereitgestellte Versuchsobjekt nach Freigabe durch die Betreuung. Mitgebrachte Objekte werden vor dem Einbringen geprüft.
+\end{note}
+
+\newpage
+\heading{aufbau}{02 / VERSUCHSAUFBAU}{Material und Kopfspule vorbereiten}
+Diese Materialien stehen für den Versuch bereit. Das Foto dient nur der Materialübersicht.
+
+\bild[trim={0\width} {.25\height} {0\width} {.355\height},clip]{mr_needed_material.JPG}{Materialübersicht; die Zuordnung folgt von links nach rechts.}
+
+\begin{tabularx}{\linewidth}{@{}P{8mm}P{54mm}Y@{}}
+\toprule
+\textbf{Nr.} & \textbf{Material} & \textbf{Verwendung} \\
+\midrule
+1 & Wasserphantom & Referenzobjekt mit Wasser. \\
+2 & Sandsäcke & Objekt innerhalb der Spule gegen Verrutschen sichern. \\
+3 & Wasser-/Ölflasche & Zwei Flüssigkeitsbereiche für Spektrum und Dixon. \\
+4 & Kittel mit eisenhaltigem Knopf & Bereitgestelltes Störobjekt für den Artefaktvergleich. \\
+5 & Kopfspulen-Oberteil & Spule nach der Lagerung schließen. \\
+6 & Kopfspulen-Unterteil & Aufnahme und Lagerung des Messobjekts. \\
+\bottomrule
+\end{tabularx}
+
+\subhead{Kopfspule anschließen und Objekt lagern}
+\noindent\begin{minipage}[t]{.47\linewidth}\vspace{0pt}
+\bild[trim={.10\width} {.11\height} {.24\width} {.12\height},clip]{installed_headcoil.JPG}{Aufgesetztes Oberteil der Kopfspule am Kopfende des Tisches.}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+\begin{enumerate}
+\item Platzieren Sie das Unterteil am Kopfende des Tisches. Schließen Sie die Kopfspule am \textbf{oberen Anschluss an der Kopfseite} an.
+\item Legen Sie das gewählte Objekt in die Spule. Sichern Sie es bei Bedarf mit Sandsäcken.
+\item Setzen Sie das Oberteil auf und lassen Sie Sitz und Anschluss prüfen.
+\item Lassen Sie Wasser und Öl zur Ruhe kommen. Behalten Sie die Lagerung zwischen Vergleichsaufnahmen bei.
+\end{enumerate}
+\end{minipage}
+
+\newpage
+\heading{position}{03 / OBJEKTPOSITION}{Die Objektmitte einmessen}
+Der Scanner benötigt die Position des Objekts auf dem Tisch. Verwenden Sie dafür die Bedienelemente unter dem seitlichen Display.
+
+\noindent\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+% EXIF-Orientierung 3: pdfLaTeX benötigt eine explizite Drehung um 180 Grad.
+\bild[angle=180,trim={.18\width} {.08\height} {.20\width} {.05\height},clip]{mr_display.JPG}{Seitliches Display mit den Tasten unterhalb des Bildschirms: Laser links, Kippschalter mittig, Bestätigung rechts.}
+\end{minipage}\hfill
+\begin{minipage}[t]{.47\linewidth}\vspace{0pt}
+\begin{enumerate}
+\item Aktivieren Sie den Positionierlaser mit der \textbf{linken Taste neben dem Kippschalter} (Lampensymbol). Auf dem Tisch erscheint eine rote Laserlinie.
+\item Fahren Sie den Tisch mit dem \textbf{Kippschalter} so weit nach vorne, bis die Laserlinie die \textbf{Mitte des Objekts in der Kopfspule} trifft.
+\item Bestätigen Sie die Position mit der \textbf{rechten Taste} (Tischsymbol). Diese leuchtet anschließend grün.
+\item Lassen Sie die weitere Tischpositionierung und die Freigabe zum Messen von der Betreuung begleiten.
+\end{enumerate}
+\end{minipage}
+
+\subhead{Orientierung im Scanfenster}
+\noindent\begin{minipage}[t]{.52\linewidth}\vspace{0pt}
+\bild{START_SCREEN.png}{Scanfenster vor dem Laden einer Sequenz.}
+\end{minipage}\hfill
+\begin{minipage}[t]{.44\linewidth}\vspace{0pt}
+\begin{itemize}
+\item \textbf{Links:} Sequenzliste der aktuellen Untersuchung und Messstatus.
+\item \textbf{Rechts oben:} Vorschau, Planungsansichten und geladene Bilder.
+\item \textbf{Unten:} \ui{ExamCards} als Sequenzbibliothek bzw. Parameter der geöffneten Sequenz.
+\item \textbf{Links unten:} \ui{Start Scan} zum Starten der bestätigten Sequenz.
+\end{itemize}
+\end{minipage}
+
+\begin{note}
+\textbf{Nächster Schritt: Survey.} Die eingemessene Tischposition ersetzt die Bildplanung nicht. Nehmen Sie zunächst eine Übersicht auf und planen Sie darauf die folgenden Messungen.
+\end{note}
+
+\newpage
+\heading{survey}{04 / ERSTE MESSUNG}{Survey laden, bestätigen und starten}
+\begin{enumerate}
+\item Öffnen Sie unten die \ui{ExamCards}. Die Praktikumssequenzen liegen unter \ui{Hospital $\rightarrow$ LfB $\rightarrow$ MR-Praktikum}.
+\item Ziehen Sie zuerst \seq{Survey (CS Sequenzen)} mit gedrückter Maustaste aus der Bibliothek in die \textbf{linke Sequenzliste}.
+\item Öffnen Sie den Eintrag per Doppelklick. Prüfen Sie die Einstellungen und bestätigen Sie mit dem grünen \ui{Accept}. \textbf{Erst danach} starten Sie links unten mit \ui{Start Scan}.
+\item Warten Sie das Messende ab. Die laufende Aufnahme zeigt einen Fortschrittsbalken; eine fertige Sequenz ist blau hinterlegt und trägt ein Häkchen. Öffnen Sie das Ergebnis per Doppelklick.
+\end{enumerate}
+
+\noindent\begin{minipage}[t]{.48\linewidth}\vspace{0pt}
+\bild[trim={.21\width} {.25\height} {.40\width} {.53\height},clip]{LOAD_SEQUENCE_1.png}{Bibliothek im Reiter \ui{Hospital}: Survey und weitere Praktikumssequenzen.}
+\end{minipage}\hfill
+\begin{minipage}[t]{.48\linewidth}\vspace{0pt}
+\bild[trim={0\width} {.41\height} {.39\width} {.155\height},clip]{LOAD_SEQUENCE_2.png}{Survey in der linken Liste; grünes \ui{Accept} zum Übernehmen der Parameter.}
+\end{minipage}
+
+\noindent\begin{minipage}[t]{.25\linewidth}\vspace{0pt}
+\bild[trim={0\width} {0\height} {.793\width} {.87\height},clip]{SCAN_RUNNING.png}{Während der Messung: Fortschritt und Restzeit links unten.}
+\end{minipage}\hfill
+\begin{minipage}[t]{.71\linewidth}\vspace{0pt}
+\bild[trim={0\width} {.47\height} {0\width} {.045\height},clip]{SCAN_RESULT.png}{Abgeschlossener Survey mit Häkchen und drei Übersichtsansichten des Objekts.}
+\end{minipage}
+
+\begin{note}
+\textbf{Planungsgrundlage:} Der Survey liefert ein grobes Bild von Lage und Ausdehnung des Objekts. Alle weiteren Aufnahmen werden auf dieser Übersicht geplant. Nach einem Objektwechsel nehmen Sie einen neuen Survey auf.
+\end{note}
+
+\newpage
+\heading{planung}{05 / BILDFELD UND KONTRAST}{Schichten planen und Flipwinkel variieren}
+\begin{enumerate}
+\item Laden Sie für diese Übungen ein vorbereitetes FFE-Protokoll, z.\,B. \seq{T1W\_FFE IP}, und öffnen Sie es per Doppelklick. Unter \ui{Summary} finden Sie Bildfeld (\emph{Field of View}, FOV), Voxel und Schichtanzahl; \ui{Geometry} enthält die detaillierte Geometrie.
+\item Variieren Sie zunächst Bildfeld, Position, Orientierung und Schichtanzahl. Die \textbf{roten Linien und Zahlen} in der Vorschau zeigen die geplanten Schichten. Wählen Sie schließlich eine Ebene, die \textbf{Wasser, Öl und den Übergang} abbildet.
+\item Öffnen Sie \ui{Contrast} für TR, TE, \ui{Echos} und \ui{Flip angle}. Untersuchen Sie ein bis zwei \textbf{von 90$^\circ$ verschiedene Flipwinkel} und vergleichen Sie die Bilder mit Ihrer Referenzaufnahme. Dokumentieren Sie jeden Winkel; halten Sie die übrigen Parameter für diesen Vergleich konstant.
+\item Bestätigen Sie jede geänderte Einstellung mit \ui{Accept} und starten Sie mit \ui{Start Scan}. Beurteilen Sie Signal und Kontrast in Wasser und Öl.
+\end{enumerate}
+
+\bild[trim={.21\width} {.32\height} {.40\width} {.58\height},clip]{SEQUENZ_PARAMETERS.png}{Parameterbereich mit \ui{Summary}, \ui{Geometry} und \ui{Contrast}; hier ist \ui{Geometry} geöffnet.}
+
+\bild[trim={.21\width} {.47\height} {0\width} {.045\height},clip]{SEQUENCE_FOV_PLANNING.png}{Beispiel einer Schichtplanung. Die roten Linien markieren Lage und Anzahl der Schichten. Die gezeigten T2W-TSE-Werte sind keine Vorgabe für die FFE-Messungen.}
+
+\begin{note}
+\textbf{Für die folgenden Echovergleiche:} Übernehmen Sie dieselbe Position, Orientierung, Schichtdicke, dasselbe FOV und dieselbe Matrix. Stellen Sie nach dem Flipwinkelversuch wieder den für die Multi-Echo-Messung vorgesehenen Winkel ein. Behalten Sie den vorbereiteten Aufnahmemodus bei: Eine gemeinsame Auswerteebene kann auch aus einem \textbf{3D-Schichtstapel} stammen.
+\end{note}
+
+\newpage
+\heading{spektrum}{06 / FREQUENZBESTIMMUNG}{Wasser- und Fettpeak im Spektrum finden}
+\begin{enumerate}
+\item Laden Sie \seq{T1W\_FFE spectrum}, übernehmen Sie die geplante Geometrie und starten Sie nach \ui{Accept} die Messung.
+\item Es öffnet sich die \ui{Monitoring Console} zur interaktiven $f_0$-Bestimmung. Lesen Sie die Resonanzfrequenz (Larmorfrequenz) in der Kopfzeile und die Frequenzpositionen der Peaks auf der horizontalen Achse ab.
+\item Messen Sie zunächst die \textbf{Wasserflasche} als Referenz und anschließend die \textbf{Wasser-/Ölflasche}. Nach dem Umbau erneut einmessen und einen Survey aufnehmen. Ordnen Sie den Wasserpeak durch den Vergleich zu und suchen Sie im Gemisch den Fett-/Ölpeak.
+\item Notieren Sie die beiden Peakpositionen und den \textbf{Betrag ihres Frequenzabstands}. Beachten Sie die Richtung der beschrifteten Frequenzachse. Schließen Sie die interaktive Bestimmung nach Rücksprache mit der Betreuung mit \ui{Proceed} ab.
+\end{enumerate}
+
+\noindent\begin{minipage}{.68\linewidth}
+\bild[trim={.003\width} {.417\height} {.47\width} {.083\height},clip]{SEQUENCE_SPECTRUM.png}{Spektrum mit Resonanzfrequenz und relativer Frequenzachse in Hz.}
+\end{minipage}\hfill
+\begin{minipage}{.28\linewidth}
+{\small Die automatische Meldung \texttt{no fat detected} ersetzt die eigene Peakzuordnung nicht. Vergleichen Sie Wasserreferenz und Gemisch.}
+\end{minipage}
+
+\subhead{Aus dem Peakabstand die Echozeiten vorbereiten}
+Bezeichnen Sie die abgelesenen relativen Peakpositionen mit $f_\mathrm{W}$ und $f_\mathrm{F}$. Die chemische Phasendifferenz durchläuft in der Zeit $T_\mathrm{cs}$ eine volle Umdrehung:
+\[
+|\Delta f_\mathrm{cs}|=|f_\mathrm{W}-f_\mathrm{F}|,
+\qquad T_\mathrm{cs}=\frac{1}{|\Delta f_\mathrm{cs}|}.
+\]
+Setzen Sie den Frequenzabstand in Hz ein; dann erhalten Sie $T_\mathrm{cs}$ in Sekunden. Für die TE-Eingabe rechnen Sie in Millisekunden um.
+
+\begin{tabularx}{\linewidth}{@{}P{47mm}Y Y@{}}
+\toprule
+\textbf{Messgröße} & \textbf{Wasserflasche} & \textbf{Wasser-/Ölflasche} \\
+\midrule
+Resonanzfrequenz $f_0$ [Hz] & \hrulefill & \hrulefill \\
+Wasserpeak $f_\mathrm{W}$ [Hz] & \hrulefill & \hrulefill \\
+Fett-/Ölpeak $f_\mathrm{F}$ [Hz] & \textit{falls erkennbar} & \hrulefill \\
+$|\Delta f_\mathrm{cs}|$ [Hz] / $T_\mathrm{cs}$ [ms] & \textit{aus dem Gemisch} & \blank\,/\,\blank \\
+\bottomrule
+\end{tabularx}
+
+\newpage
+\heading{dual}{07 / ZWEI ECHOS}{In-Phase und Out-of-Phase aufnehmen}
+Verwenden Sie den zuvor bestimmten Frequenzabstand, um die relative Phase von Wasser und Fett zu planen. Im vereinfachten Modell gelten
+\[
+TE_\mathrm{IP}=nT_\mathrm{cs},\qquad
+TE_\mathrm{OP}=\left(n+\tfrac12\right)T_\mathrm{cs}.
+\]
+Dabei ist $n$ ganzzahlig. Wählen Sie \textbf{positive, am Scanner erreichbare} Echozeiten. IP (In-Phase) bedeutet gleiche chemische Phase; OP (Out-of-Phase) bedeutet eine halbe Umdrehung Phasenunterschied.
+
+\subhead{Dual-Echo-Sequenz einstellen}
+\begin{enumerate}
+\item Laden Sie \seq{T1W\_FFE dual echo} und übernehmen Sie die festgelegte Geometrie. Verwenden Sie \textbf{zwei Echos derselben Akquisition}.
+\item Berechnen Sie aus Ihrem gemessenen Frequenzabstand geeignete OP-/IP-Zeiten. Öffnen Sie \ui{Contrast}, stellen Sie unter \ui{Echos} zwei Echos ein und wählen Sie bei \ui{TE} die Eingabe \ui{User defined}. Tragen Sie Ihre berechneten Zeiten ein; die Reihenfolge richtet sich nach den gewählten Zeiten.
+\item Lassen Sie \textbf{Magnitudenbilder beider Echos} rekonstruieren und speichern. Verwenden Sie keine Fett- oder Wasserunterdrückung.
+\item Bestätigen Sie mit \ui{Accept}, starten Sie mit \ui{Start Scan} und öffnen Sie nach Messende das Ergebnis per Doppelklick. Vergleichen Sie beide Echos auf derselben Ebene: Wo ändert sich das Signal, insbesondere am Flüssigkeitsübergang?
+\end{enumerate}
+
+\begin{note}
+\textbf{Ihre berechneten Echozeiten:} Halten Sie den Rechenweg und die gewählten Werte von $n$ fest. Begründen Sie die IP-/OP-Zuordnung anhand Ihres gemessenen Frequenzabstands.
+\par $TE_\mathrm{OP}=$ \blank\ ms \hfill $TE_\mathrm{IP}=$ \blank\ ms
+\end{note}
+
+\bild[trim={.21\width} {.47\height} {0\width} {.045\height},clip]{SCAN_RESULT.png}{Survey als Orientierung für eine gemeinsame Ebene durch beide Flüssigkeitsbereiche. Ordnen Sie Wasser und Öl anhand der bekannten Befüllung und dokumentierten Lagerung zu. Die Bildhelligkeit allein erlaubt keine eindeutige Zuordnung.}
+
+{\small\textbf{Weitere Beispielwerte aus DICOM:} TR $200\ms$, Flipwinkel $20^\circ$, Schichtdicke $10\,\mathrm{mm}$, Bildfeld $130\times130\,\mathrm{mm}^2$, rekonstruierte Matrix $512\times512$, Aufnahmemodus 3D. Die rekonstruierte Matrix ist nicht mit der akquirierten Auflösung gleichzusetzen. Übernehmen Sie das vorbereitete Protokoll und dokumentieren Sie Änderungen.}
+
+\newpage
+\heading{triple}{08 / DREI ECHOS}{Triple-Echo-Messung und optionale \texorpdfstring{$B_0$}{B0}-Karte}
+Berechnen Sie aus Ihrem gemessenen Frequenzabstand \textbf{drei geeignete, aufsteigende Echozeiten}. Verwenden Sie dazu die IP-/OP-Beziehungen aus dem vorherigen Abschnitt. Planen Sie für die optionale $B_0$-Aufgabe die beiden äußeren Echos mit annähernd gleichem chemischen Phasenzustand.
+
+Laden Sie \seq{T1W\_FFE triple echo}, übernehmen Sie dieselbe Geometrie und stellen Sie unter \ui{Contrast $\rightarrow$ Echos} drei Echos ein. Prüfen Sie mit der Betreuung, ob Ihre berechneten Zeiten am Scanner erreichbar sind, und tragen Sie sie bei \ui{TE $\rightarrow$ User defined} ein. Bestätigen Sie mit \ui{Accept} und starten Sie mit \ui{Start Scan}.
+
+Vergleichen Sie nach Messende die drei \textbf{Magnitudenbilder auf derselben Ebene}. Ordnen Sie jedem Echo anhand von $|\Delta f_\mathrm{cs}|\,TE$ den chemischen Phasenzustand zu. Beschreiben Sie Signaländerungen in Wasser, Öl und an ihrem Übergang.
+
+\subhead{Zusätzliche Bildkomponenten für die optionale $B_0$-Auswertung}
+Für eine näherungsweise Feldkarte benötigen Sie \textbf{direkte Phasenbilder und die zugehörigen Magnituden}. Lassen Sie dafür bei der Triple-Echo-Aufnahme \textbf{beide Komponenten je Echo} rekonstruieren und speichern. IP/OP bezeichnet die relative chemische Phase; das ist etwas anderes als die gespeicherte Bildkomponente \emph{Phase}.
+
+\begin{tabularx}{\linewidth}{@{}P{16mm}P{35mm}P{42mm}Y@{}}
+\toprule
+\textbf{Echo} & \textbf{Berechnete TE [ms]} & \textbf{Speichern für $B_0$} & \textbf{Geplanter Phasenzustand} \\
+\midrule
+1 & \hrulefill & Magnitude + Phase & \hrulefill \\
+2 & \hrulefill & Magnitude + Phase & \hrulefill \\
+3 & \hrulefill & Magnitude + Phase & \hrulefill \\
+\bottomrule
+\end{tabularx}
+
+\subhead{Den Echoabstand für die Feldkarte selbst berechnen}
+Berechnen Sie für die beiden äußeren Echos $\Delta TE=TE_3-TE_1$. Prüfen Sie, ob dazwischen näherungsweise eine ganze Zahl chemischer Umdrehungen liegt. Setzen Sie dafür den gemessenen Frequenzabstand in Hz und den Echoabstand in Sekunden ein:
+\[
+|\Delta f_\mathrm{cs}|\,(TE_3-TE_1)\approx k,\qquad k\in\mathbb{Z}.
+\]
+Ein beliebiges IP-/OP-Phasenpaar vermischt chemische Phase und Feldphase. Verwenden Sie in der Auswertung die \textbf{tatsächlichen TE aus DICOM} und prüfen Sie die Bedingung damit erneut.
+
+\begin{note}
+\textbf{Ihre Rechnung:} Dokumentieren Sie den Echoabstand und die Zahl der chemischen Umdrehungen. Begründen Sie, weshalb Ihre gewählten Echozeiten für die Feldkarte geeignet sind.
+\par $\Delta TE=$ \blank\ ms \hfill $|\Delta f_\mathrm{cs}|\,\Delta TE=$ \blank\ Umdrehungen
+\end{note}
+
+\begin{itemize}
+\item Die beiden Phasen stammen aus derselben Akquisition, mit gleicher Geometrie und unveränderter Objektlage, Shim- und Frequenzeinstellung innerhalb der Aufnahme.
+\item Die direkte Phase benötigt eine nachvollziehbare Einheit und Skalierung. Im Classic-Beispiel ist sie in \texttt{mrad} gespeichert; das Notebook rechnet in rad um.
+\item Die Magnituden beider verwendeten Echos erlauben eine Signalmaske. Eine fertige Scanner-Feldkarte ersetzt diese Phasenbilder nicht.
+\end{itemize}
+{\small Beginnen Sie mit einer signalstarken \textbf{Wasser-ROI außerhalb der Übergangszone}. Die optionale Auswertung ist eine Näherung. Das maskierte Unwrapping behandelt Phasensprünge, bestimmt jedoch keinen absoluten Feld-Offset.}
+
+\newpage
+\heading{varianten}{09 / VERGLEICHE UND MESSPROTOKOLL}{Die Messungen mit weiteren Objekten wiederholen}
+Wiederholen Sie die Messfolge mit den folgenden Objekten. Beim Objektwechsel werden Lagerung, Einmessen und Survey erneut durchgeführt. Passen Sie die Planung an das neue Objekt an; halten Sie sie \textbf{innerhalb eines Vergleichs} konstant. Bei Objekten ohne zwei erkennbare Flüssigkeitsbereiche entfällt deren gemeinsame Darstellung.
+
+\begin{tabularx}{\linewidth}{@{}P{37mm}Y@{}}
+\toprule
+\textbf{Objekt / Zustand} & \textbf{Worauf Sie beim Vergleich achten} \\
+\midrule
+Wasserflasche & Referenz für die Peakzuordnung; Signal und Homogenität in einem wasserreichen Objekt. \\
+Wasser-/Ölflasche & Beide Flüssigkeitsbereiche, ihr Übergang und die Unterschiede zwischen den Echos. \\
+Flasche mit Metallknopf & Bereitgestellten Kittel mit Knopf nach Freigabe um die Flasche legen. Lage des Knopfs dokumentieren; gegenüber der Aufnahme ohne Knopf möglichst dieselbe Geometrie verwenden. Signalverlust, Verzerrung und Phasenänderungen untersuchen. \\
+Weiteres organisches Objekt & Mitgebrachtes oder bereitgestelltes, von der Betreuung geprüftes Objekt verwenden. Struktur, Signal und gegebenenfalls erkennbare Wasser-/Fettanteile beschreiben. \\
+\bottomrule
+\end{tabularx}
+
+\subhead{Messungen je Objekt abhaken}
+{\small
+\begin{tabularx}{\linewidth}{@{}Y P{21mm}P{22mm}P{23mm}P{20mm}P{20mm}@{}}
+\toprule
+\textbf{Objekt} & \textbf{Survey / FOV} & \textbf{Flipwinkel} & \textbf{Spektrum} & \textbf{2 Echos} & \textbf{3 Echos} \\
+\midrule
+Wasser & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
+Wasser/Öl & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
+Mit Knopf & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
+Organisches Objekt & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
+\bottomrule
+\end{tabularx}}
+
+\subhead{Einstellungen und Serien eindeutig festhalten}
+Notieren Sie pro Aufnahme Objektzustand, Sequenz, tatsächliche TE, TR, Flipwinkel und Geometrie. Kennzeichnen Sie insbesondere Aufnahmen \emph{mit} und \emph{ohne} Knopf getrennt. Verwenden Sie das folgende Schema je Objekt, bei Bedarf auf einem zusätzlichen Blatt.
+
+\begin{tabularx}{\linewidth}{@{}P{57mm}Y@{}}
+\toprule
+Gruppenkennung / Objekt & \hrulefill \\
+Sequenz / Serienkennung & \hrulefill \\
+TE je Echo [ms] & \hrulefill \\
+TR [ms] / Flipwinkel [$^\circ$] & \hrulefill \\
+FOV / Matrix / Schichtdicke & \hrulefill \\
+Referenzebene / Bilddatei & \hrulefill \\
+Beobachtungen / Änderungen & \hrulefill \\[3mm]
+ & \hrulefill \\
+\bottomrule
+\end{tabularx}
+
+{\small\textbf{Vor dem Export:} Zusammengehörige Echos auf derselben Ebene, für $B_0$ zusätzlich direkte Phasen und Magnituden prüfen. Änderungen an Lagerung, Geometrie, Shim oder Referenzfrequenz festhalten.}
+
+\newpage
+\heading{export}{10 / DATENEXPORT}{Classic-DICOM auf den USB-Stick exportieren}
+\begin{enumerate}
+\item Öffnen Sie \ui{Patients $\rightarrow$ Administration} (\ui{F4}). Wählen Sie die Untersuchung Ihrer Gruppe und die zu exportierenden Messungen.
+\item Klicken Sie unten auf \ui{Disk Files}. Wählen Sie unter \ui{Destination} über \ui{Browse\ldots} den bereitgestellten USB-Stick bzw. dessen DICOM-Zielordner.
+\item Wählen Sie im Reiter \ui{Dicom Export} das Format \ui{Classic Dicom} und aktivieren Sie \ui{Series Split}. Starten Sie den Export mit \ui{Proceed}.
+\item Schließen Sie das Fenster \ui{File Export}. Öffnen Sie in der Patientenverwaltung \ui{Manage Job Queue} und prüfen Sie den Status \textbf{Ihrer Exportaufträge}.
+\item Warten Sie, bis \textbf{alle zugehörigen Aufträge \ui{Finished} bzw. 100\,\% abgeschlossen} sind. Entfernen Sie den Stick erst nach abgeschlossenem Schreibvorgang und ordnungsgemäßem Auswerfen.
+\end{enumerate}
+
+\noindent\begin{minipage}[t]{.36\linewidth}\vspace{0pt}
+\centering
+\adjincludegraphics[trim={.237\width} {.64\height} {.565\width} {.171\height},clip,width=\linewidth]{EXPORT.png}
+\par\vspace{2mm}
+\adjincludegraphics[trim={.237\width} {.442\height} {.565\width} {.524\height},clip,width=\linewidth]{EXPORT.png}
+\captionof{figure}{Exportdialog (Ausschnitte): \ui{Classic Dicom}, \ui{Series Split} und \ui{Proceed}.}
+\end{minipage}\hfill
+\begin{minipage}[t]{.60\linewidth}\vspace{0pt}
+\bild[trim={.349\width} {.762\height} {.45\width} {.125\height},clip]{JobQueue.png}{Ausschnitt der Job Queue: Der Status \ui{Finished} kennzeichnet einen abgeschlossenen Auftrag. Prüfen Sie alle Aufträge Ihrer Gruppe.}
+\end{minipage}
+
+\subhead{Dateien und Bildkomponenten kontrollieren}
+Auf dem Stick liegt ein \texttt{DICOM}-Verzeichnis mit den exportierten Serien, je nach Export auch ohne \texttt{.dcm}-Endung. Benötigt werden \textbf{Bilddaten mit Metadaten}, keine Screenshots.
+
+{\small
+\begin{tabularx}{\linewidth}{@{}P{38mm}P{29mm}Y@{}}
+\toprule
+\textbf{Für die Auswertung} & \textbf{Je Ebene} & \textbf{Benötigte Komponenten} \\
+\midrule
+Dixon & 2 Echobilder & OP-Magnitude und IP-Magnitude. \\
+Triple-Echo mit $B_0$ & 6 Echobilder & Drei Magnituden und drei direkte Phasen; die berechneten äußeren Echozeiten auf Eignung für $B_0$ prüfen. \\
+\bottomrule
+\end{tabularx}}
+{\small Dixon plus vollständiger Triple-Echo-Zusatz ergeben \textbf{acht benötigte Echobilder pro Ebene}. Weitere exportierte Komponenten und der ganze Schichtstapel dürfen enthalten sein.}
+
+\subhead{Im Notebook weiterarbeiten}
+Laden Sie Ihre eigenen DICOM-Slices im Jupyter-Notebook in den Ordner \texttt{/data/eigne} hoch. Ersetzen Sie im Notebook die Dateipfade der Demo-Daten durch die Pfade zu Ihren eigenen Slices in diesem Ordner.
+
+\end{document}

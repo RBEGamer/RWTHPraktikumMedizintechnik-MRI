@@ -1,0 +1,21 @@
+datei,original_datei,aufnahme,komponente,echozeit_ms,position_mm
+wasser_oel_dual_echo1_magnitude.dcm,IM_0089,T1W_FFE dual echo,M,6.901,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_dual_echo2_magnitude.dcm,IM_0090,T1W_FFE dual echo,M,13.8,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_dual_echo1_phase.dcm,IM_0107,T1W_FFE dual echo,P,6.901,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_dual_echo2_phase.dcm,IM_0108,T1W_FFE dual echo,P,13.8,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_triple_echo1_magnitude.dcm,IM_0132,T1W_FFE triple echo,M,9.201,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_triple_echo2_magnitude.dcm,IM_0133,T1W_FFE triple echo,M,16.101,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_triple_echo3_magnitude.dcm,IM_0134,T1W_FFE triple echo,M,23.001,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_triple_echo1_phase.dcm,IM_0159,T1W_FFE triple echo,P,9.201,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_triple_echo2_phase.dcm,IM_0160,T1W_FFE triple echo,P,16.101,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_triple_echo3_phase.dcm,IM_0161,T1W_FFE triple echo,P,23.001,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_mit_knopf_dual_echo1_magnitude.dcm,IM_0234,T1W_FFE dual echo button,M,6.901,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_mit_knopf_dual_echo2_magnitude.dcm,IM_0235,T1W_FFE dual echo button,M,13.8,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_mit_knopf_dual_echo1_phase.dcm,IM_0252,T1W_FFE dual echo button,P,6.901,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_mit_knopf_dual_echo2_phase.dcm,IM_0253,T1W_FFE dual echo button,P,13.8,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_mit_knopf_triple_echo1_magnitude.dcm,IM_0275,T1W_FFE triple echo button,M,9.201,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_mit_knopf_triple_echo2_magnitude.dcm,IM_0276,T1W_FFE triple echo button,M,16.101,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_mit_knopf_triple_echo3_magnitude.dcm,IM_0277,T1W_FFE triple echo button,M,23.001,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_mit_knopf_triple_echo1_phase.dcm,IM_0302,T1W_FFE triple echo button,P,9.201,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_mit_knopf_triple_echo2_phase.dcm,IM_0303,T1W_FFE triple echo button,P,16.101,-64.873046875;-2.8314272238276;56.3306689580204
+wasser_oel_mit_knopf_triple_echo3_phase.dcm,IM_0304,T1W_FFE triple echo button,P,23.001,-64.873046875;-2.8314272238276;56.3306689580204
