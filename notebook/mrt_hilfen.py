@@ -246,6 +246,18 @@ def magnitude_zu_phase(records, meta):
     return lade(found[0])[0]
 
 
+def phase_zu_magnitude(records, meta):
+    """Genau die zur Magnitude gehörende exportierte Phase in rad laden."""
+    found = [r for r in records if r['gruppe'] == meta['gruppe'] and r['komponente'] == 'PHASE'
+             and np.isclose(r['echozeit_ms'], meta['echozeit_ms'], rtol=0, atol=1e-6)
+             and gleiche_geometrie(r, meta)]
+    if len(found) != 1:
+        raise ValueError('Zur Magnitude wird genau eine passende Phase derselben Aufnahme, '
+                         f'Ebene und Echozeit benötigt; gefunden: {len(found)}. '
+                         'Die Phasenbilder beider Echos mit exportieren.')
+    return lade(found[0])
+
+
 def fenster(*images):
     """Gemeinsame robuste Darstellungsgrenze; verändert keine Rechendaten."""
     return (0., float(np.percentile(np.concatenate([a.ravel() for a in images]), 99)))
@@ -376,6 +388,78 @@ def feldkarte(data, mask, meta, titel, grenze=.6):
     # Die ganze Schicht ist in der ROI-Ansicht dokumentiert; hier ROI vergrößern.
     bounds = ((x.min()-10)*dx, (x.max()+10)*dx, (y.min()-10)*dy, (y.max()+10)*dy)
     return bild(np.ma.masked_where(~mask, data), titel, meta, (-grenze, grenze), 'RdBu_r', bounds)
+
+
+def wasser_oel_phasenblend(ip, op, phase_ip, phase_op, meta, wasserreferenz):
+    """IP/OP-Phasenlage als Farbgewicht, IP-Magnitude als Helligkeit.
+
+    Eine bekannte Wasser-ROI setzt den globalen Phasenbezug. Es gibt keine
+    Annahme über oben/unten und keine räumliche B0-Korrektur. Farbgewichte
+    sind keine Stoff- oder Signalanteile einer Dixon-Rekonstruktion.
+    """
+    from matplotlib.patches import Patch
+
+    ip, op, phase_ip, phase_op = (np.asarray(a, dtype=float) for a in
+                                  (ip, op, phase_ip, phase_op))
+    referenz = np.asarray(wasserreferenz, dtype=bool)
+    if ip.ndim != 2 or any(a.shape != ip.shape for a in (op, phase_ip, phase_op, referenz)):
+        raise ValueError('Magnituden, Phasen und Wasserreferenz müssen dieselbe 2D-Form besitzen.')
+    endlich = np.isfinite(ip) & np.isfinite(op) & np.isfinite(phase_ip) & np.isfinite(phase_op)
+    if not endlich.any():
+        raise ValueError('Keine endlichen Bildwerte für den Phasenblend.')
+    skala_ip, skala_op = (float(np.percentile(a[endlich], 99)) for a in (ip, op))
+    if min(skala_ip, skala_op) <= 0:
+        raise ValueError('Der Phasenblend benötigt Signal in beiden Echos.')
+    signal_ip = np.isfinite(ip) & (ip > .15 * skala_ip)
+    gueltig = endlich & signal_ip & (op > .15 * skala_op)
+    referenz = referenz & gueltig
+    if referenz.sum() < 16:
+        raise ValueError('Wasserreferenz enthält weniger als 16 Pixel mit Signal in beiden Echos.')
+
+    # Zirkulär mitteln: ein Sprung von +pi nach -pi darf den Bezug nicht ändern.
+    phasor = np.zeros(ip.shape, dtype=complex)
+    phasor[gueltig] = np.exp(1j * (phase_op[gueltig] - phase_ip[gueltig]))
+    gewichte = (ip[referenz] / skala_ip) * (op[referenz] / skala_op)
+    bezug = np.sum(gewichte * phasor[referenz]) / gewichte.sum()
+    kohaerenz = float(abs(bezug))
+    if kohaerenz < .5:
+        raise ValueError('Phasen in der Wasserreferenz sind inkohärent. '
+                         'Eine kleinere signalstarke Wasser-ROI wählen.')
+    offset = float(np.angle(bezug))
+    delta_phase = np.full(ip.shape, np.nan)
+    delta_phase[gueltig] = np.angle(phasor[gueltig] * np.exp(-1j * offset))
+    oelgewicht = (1 - np.cos(delta_phase)) / 2
+    wassergewicht = 1 - oelgewicht
+
+    # Nur die Darstellung wird auf [0, 1] begrenzt; keine Rechendaten verändern.
+    helligkeit = np.zeros(ip.shape)
+    helligkeit[signal_ip] = np.clip(ip[signal_ip] / skala_ip, 0, 1)
+    rgb = np.zeros((*ip.shape, 3))
+    rgb[..., 0][gueltig] = oelgewicht[gueltig] * helligkeit[gueltig]
+    rgb[..., 2][gueltig] = wassergewicht[gueltig] * helligkeit[gueltig]
+    grau = signal_ip & ~gueltig
+    rgb[grau] = helligkeit[grau, None]
+
+    fig, ax = plt.subplots(figsize=(7, 7.5), constrained_layout=True)
+    extent = _extent(meta, ip.shape)
+    ax.imshow(rgb, extent=extent, interpolation='nearest')
+    dy, dx = meta['pixelabstand_mm']
+    ax.contour(np.arange(ip.shape[1])*dx, np.arange(ip.shape[0])*dy,
+               referenz.astype(float), levels=[.5], colors='white', linewidths=.8)
+    ax.set(title='Öl rot · Wasser blau\nPhasenblend mit Magnitude als Helligkeit',
+           xlabel='x in Schichtebene [mm]', ylabel='y in Schichtebene [mm]')
+    ax.legend(handles=[Patch(color='red', label='öltypische Phasenlage'),
+                       Patch(color='blue', label='wassertypische Phasenlage'),
+                       Patch(color='.6', label='Phase nicht auswertbar'),
+                       Patch(facecolor='none', edgecolor='black', label='Weißer Umriss: Wasserreferenz')],
+              loc='upper center', bbox_to_anchor=(.5, -.11), ncol=2, frameon=False)
+    fig.supxlabel('Farbe: relative IP/OP-Phase · Helligkeit: IP-Magnitude\n'
+                  'Wasserreferenziert · keine räumliche B₀-Korrektur / Konzentrationskarte', fontsize=9)
+    plt.show()
+    return SimpleNamespace(figure=fig, rgb=rgb, delta_phase_rad=delta_phase,
+                           oelgewicht=oelgewicht, wassergewicht=wassergewicht,
+                           gueltig=gueltig, referenzmaske=referenz,
+                           phasenoffset_rad=offset, referenz_kohaerenz=kohaerenz)
 
 
 def speichere_bild(fig, name):

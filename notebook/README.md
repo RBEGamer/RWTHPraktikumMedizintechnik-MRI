@@ -7,7 +7,7 @@ Die Scan-Anleitung zeigt, welche MRT-Aufnahmen Sie benötigen, wie Sie die gemei
 
 ## Musterlösung
 
-[`experiment_loesung.ipynb`](experiment_loesung.ipynb) enthält die ausgefüllten Rechenwege, Kurzantworten und gespeicherten Ausgaben. Sie umfasst die Wasser-/Öl-Auswertung, den Vergleich mit Metallknopf und die optionale B₀-Karte. Alle **69 Codezellen** wurden mit den 20 mitgelieferten DICOM-Bildern unter Python 3.12 vollständig und ohne Ausführungsfehler getestet.
+[`experiment_loesung.ipynb`](experiment_loesung.ipynb) enthält die ausgefüllten Rechenwege, Kurzantworten und gespeicherten Ausgaben. Sie umfasst die Wasser-/Öl-Auswertung, den Phasen-Magnitude-Blend in Abschnitt 12d, den Vergleich mit Metallknopf und die optionale B₀-Karte. Alle **71 Codezellen** wurden mit den 20 mitgelieferten DICOM-Bildern unter Python 3.12 vollständig und ohne Ausführungsfehler getestet.
 
 Die [Abbildungen und ROI-Tabellen](ergebnisse/loesung/) sowie der [Prüfbericht mit Paketversionen und Kennwerten](ergebnisse/loesung/pruefbericht.json) liegen separat unter `ergebnisse/loesung/`. Zum Wiederholen die Musterlösung im Ordner `notebook/` öffnen, bei Bedarf Schritt 0 ausführen und anschließend alle Zellen der Reihe nach starten. Die Zahlen in den Kurzantworten beziehen sich auf die voreingestellten Beispieldaten und ROIs.
 
