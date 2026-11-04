@@ -1,2 +1,0 @@
-aufnahme,datei_1,datei_2,te_1_ms,te_2_ms,referenz_mhz,position_mm,roi_zeilen_spalten,pixel,flaeche_mm2,fett_unter_W_ge_F_prozent,negativ_prozent
-T1W_FFE dual echo,wasser_oel_dual_echo1_magnitude.dcm,wasser_oel_dual_echo2_magnitude.dcm,6.901,13.8,63.889604,-64.873046875;-2.8314272238276;56.3306689580204,"(350, 410, 310, 360)",3000,193.4051513671875,17.420627531306735,0.0

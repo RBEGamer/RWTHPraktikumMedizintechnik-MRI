@@ -23,6 +23,8 @@ Die erste Notebook-Zelle lädt `wasser_oel_dual_echo2_magnitude.dcm`. Der Katalo
 
 Der Datensatz enthält ausschließlich Magnituden und direkte Phasen der Dual- und Triple-Echo-Aufnahmen. Die Wasser-/Öl-Zuordnung erfolgt anhand der bekannten Befüllung und dokumentierten Lagerung, bei den Beispieldaten oben Öl und unten Wasser. Die Bildhelligkeit allein legt diese Zuordnung nicht fest.
 
+Die aktuelle Notebook-Aufgabe verwendet die Dual-Echo-Aufnahme ohne Knopf. `phasenreferenz.json` enthält den für diese vier Bilder vorgegebenen globalen Phasenbezug, bestimmt an bekanntem Wasser. Dateiprüfsummen und die OP-/IP-Zuordnung verhindern, dass dieser Bezug versehentlich für eine andere Aufnahme verwendet wird. Er korrigiert keine räumlichen Feldunterschiede. Für andere Messungen ist eine passende Referenz von der Betreuung erforderlich.
+
 ## Ursprüngliche Dateien zuordnen
 
 [manifest.csv](manifest.csv) enthält für jedes Bild den aktuellen Dateinamen (`datei`), den ursprünglichen Exportnamen (`original_datei`), die Aufnahme, die Bildkomponente, die tatsächliche TE und die Schichtposition. Die Komponentenkürzel bedeuten `M` = Magnitude und `P` = Phase.

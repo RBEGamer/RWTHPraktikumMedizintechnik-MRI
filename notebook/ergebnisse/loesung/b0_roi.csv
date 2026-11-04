@@ -1,2 +1,0 @@
-aufnahme,datei_1,datei_2,te_1_ms,te_2_ms,referenz_mhz,position_mm,roi_zeilen_spalten,pixel,flaeche_mm2,delta_te_s,offset_ppm,std_ppm,peak_to_peak_ppm,unwrapping
-T1W_FFE triple echo,wasser_oel_triple_echo1_phase.dcm,wasser_oel_triple_echo3_phase.dcm,9.201,23.001,63.889604,-64.873046875;-2.8314272238276;56.3306689580204,"(350, 410, 310, 360)",3000,193.4051513671875,0.013800000000000002,0.4186355290222644,0.0537253052410379,0.25996393220436925,maskiert_2D
