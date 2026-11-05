@@ -1,5 +1,5 @@
-% Kompilieren aus diesem Ordner: latexmk -pdf scan_anleitung.tex
-% Alternativ: pdflatex scan_anleitung.tex (zweimal).
+% Kompilieren aus diesem Ordner: latexmk -pdf Versuchsdurchfuehrung.tex
+% Alternativ: pdflatex Versuchsdurchfuehrung.tex (zweimal).
 % Alle Fotos und Bildschirmaufnahmen liegen unter images/.
 % Ablauf: notes.txt; Echozeiten werden aus dem gemessenen Peakabstand berechnet.
 \documentclass[a4paper,11pt]{article}
@@ -169,11 +169,100 @@ Der Scanner benötigt die Position des Objekts auf dem Tisch. Verwenden Sie daf�
 \end{note}
 
 \newpage
-\heading{planung}{05 / BILDFELD UND KONTRAST}{Schichten planen und Flipwinkel variieren}
+\heading{viewer}{05 / BILDBETRACHTER}{Aufnahmen im Review ansehen und vergleichen}
+Jede abgeschlossene Sequenz öffnen Sie per Doppelklick in der linken Liste. Die Oberfläche wechselt dann von \ui{Plan} nach \ui{Review}; beide Schaltflächen stehen rechts neben den Patientendaten. Jede geöffnete Serie erscheint als eigenes Fenster \ui{ImageView}. Mit \ui{Plan} kehren Sie zur Sequenzplanung zurück, ohne die Bildfenster zu verlieren.
+
+\bild[trim={0\width} {.47\height} {0\width} {.045\height},clip]{REVIEW_IMAGEVIEW.png}{Review mit zwei Bildfenstern derselben Serie: links die Phase (\texttt{/P}), rechts die Magnitude (\texttt{/M}) von Schicht 3 von 5.}
+
+\subhead{Bildkopf lesen}
+Links oben in jedem Bild stehen die wichtigsten Kennungen. Prüfen Sie sie bei jedem Vergleich, bevor Sie Signalunterschiede interpretieren.
+
+\begin{tabularx}{\linewidth}{@{}P{34mm}Y@{}}
+\toprule
+\textbf{Eintrag} & \textbf{Bedeutung} \\
+\midrule
+\texttt{Sc 4,1} & Scan 4 der Untersuchung, erste Wiederholung; entspricht der Nummer in der linken Liste. \\
+\texttt{Sl 3/5} & Schicht 3 von 5 des Stapels. Vergleichen Sie Echos immer auf derselben Schichtnummer. \\
+\texttt{FFE /M} & Sequenztyp und Bildkomponente: \texttt{/M} Magnitude, \texttt{/P} Phase. Beide Komponenten liegen als getrennte Bilder vor. \\
+\texttt{H F R L A P} & Patientenachsen am Bildrand: Kopf/Fuß, rechts/links, anterior/posterior. \\
+\bottomrule
+\end{tabularx}
+
+\subhead{Im Bild navigieren}
+\begin{itemize}
+\item \textbf{Schichten blättern:} Fahren Sie mit der Maus über das Bild und drehen Sie das Mausrad. Die Schichtnummer \texttt{Sl} im Bildkopf zählt mit.
+\item \textbf{Werkzeugleiste:} Oberhalb jedes Bildfensters finden Sie Symbole für Bildlayout, Cine-Wiedergabe, Beschriftung, Messlineal, Fensterung (Helligkeit/Kontrast) und das Verschieben des Bildausschnitts sowie die Menüs \ui{Viewing}, \ui{Printing} und \ui{More}. Ein Tooltip nennt das Werkzeug und die zugehörige Maustaste.
+\item \textbf{Fensterung:} Mit dem Kontrastwerkzeug ziehen Sie mit gedrückter Maustaste im Bild: waagerecht ändert die Fensterbreite (Kontrast), senkrecht die Fenstermitte (Helligkeit). Die Fensterung ändert nur die Anzeige, nicht die gespeicherten Werte.
+\item \textbf{Mehrere Fenster:} Mit den Layout-Symbolen ganz links in der oberen Leiste teilen Sie den Bereich in mehrere Bildfenster. Öffnen Sie die zu vergleichenden Serien nacheinander per Doppelklick und stellen Sie in allen Fenstern dieselbe Schichtnummer ein.
+\item \textbf{Bildfenster schließen:} Über das Kreuz rechts in der Titelzeile des jeweiligen \ui{ImageView}.
+\end{itemize}
+
+\bild[trim={.21\width} {.883\height} {.396\width} {.048\height},clip]{REVIEW_IMAGEVIEW.png}{Werkzeugleiste eines Bildfensters mit Serienname, Layout-, Cine-, Beschriftungs-, Mess- und Fensterungswerkzeugen.}
+
+\begin{note}
+\textbf{Phasenbilder richtig lesen:} Ein Phasenbild zeigt Winkel von $-\pi$ bis $\pi$ als Grauwerte. Scharfe Hell-Dunkel-Sprünge im Objekt sind Phasenumbrüche und keine Strukturen. Im signalarmen Hintergrund ist die Phase Rauschen. Für den Echovergleich nutzen Sie zunächst die Magnituden; die Phasen werden im Notebook ausgewertet.
+\end{note}
+
+{\small\textbf{AutoView während der Messung:} Im Reiter \ui{AutoView} rechts unten im Planungsfenster erscheint das jeweils zuletzt rekonstruierte Bild schon während der laufenden Aufnahme. So erkennen Sie früh, ob Lage und Signal stimmen.}
+
+\heading{parameter}{06 / PARAMETER EINSTELLEN}{Sequenzparameter ändern und Echos verteilen}
+Ein Doppelklick auf eine noch nicht gemessene Sequenz öffnet sie im Modus \ui{Plan}. Oben zeigen drei Planungsansichten den Schichtstapel (orange) mit den nummerierten Schichten (rot); unten liegt der Parameterbereich mit den Reitern \ui{Summary}, \ui{Geometry}, \ui{Contrast}, \ui{Motion}, \ui{Dyn/Ang}, \ui{Postproc}, \ui{Offc/Ang}, \ui{Coils} und \ui{Conflicts}. Rechts daneben zeigt der Reiter \ui{Info} die aus den Einstellungen berechneten Werte.
+
+\subhead{So ändern Sie einen Wert}
+\begin{enumerate}
+\item Wählen Sie den Reiter, z.\,B. \ui{Contrast}, und klicken Sie die Zeile an. Die gewählte Zeile wird blau hinterlegt.
+\item Die rechte Spalte enthält entweder eine Auswahlliste (z.\,B. \ui{shortest}, \ui{user defined}, \ui{default}) oder ein Zahlenfeld. Bei \ui{user defined} erscheint direkt darunter eine eingerückte Zeile mit der Einheit, hier \ui{(ms)}, in die Sie den Wert eintragen.
+\item Abhängige Werte passen sich sofort an. Unzulässige Kombinationen meldet der Reiter \ui{Conflicts}; die Messung lässt sich erst nach dem Beheben starten.
+\item Kontrollieren Sie im Reiter \ui{Info} die tatsächlichen Werte: \ui{Act.\ TR/TE1/delta TE} zeigt das umgesetzte TR, die erste Echozeit und den Echoabstand; \ui{Min.\ TR/TE1/delta TE} nennt die am Scanner kleinsten erreichbaren Werte. Dort stehen auch Messdauer, Matrix und Voxelgröße.
+\item Übernehmen Sie mit dem grünen \ui{Accept} oder verwerfen Sie mit \ui{Cancel}. Die Kopfzeile über den Reitern zeigt nach dem Übernehmen Messdauer, Voxel, relatives SNR, TE und TR. Starten Sie danach mit \ui{Start Scan}.
+\end{enumerate}
+
+\bild[trim={.21\width} {.42\height} {.396\width} {.533\height},clip,width=.8\linewidth]{PLAN_TRIPLE_ECHO.png}{Kopfzeile der geöffneten Sequenz mit Messdauer, Voxel, relativem SNR, TE, TR und dem grünen \ui{Accept}.}
+
+\subhead{Echoanzahl, erste Echozeit und Echoabstand}
+Bei den Multi-Echo-FFE-Sequenzen dieses Praktikums geben Sie die Echozeiten nicht einzeln ein. Im Reiter \ui{Contrast} bestimmen drei Zeilen die Verteilung der Echos:
+
+\begin{tabularx}{\linewidth}{@{}P{36mm}P{30mm}Y@{}}
+\toprule
+\textbf{Zeile} & \textbf{Beispielwert} & \textbf{Bedeutung} \\
+\midrule
+\ui{Echoes} & 3 & Anzahl der Echos je Anregung. Jedes Echo liefert ein eigenes Bild. \\
+\ui{TE first} & user defined, 9.2 & Echozeit $TE_1$ des ersten Echos in ms. \\
+\ui{echospacing} & user defined, 6.9 & Abstand $\Delta TE$ zwischen zwei aufeinanderfolgenden Echos in ms. \\
+\ui{flyback} & no & Auslesemodus; die Voreinstellung bleibt. \\
+\bottomrule
+\end{tabularx}
+
+Die Echos liegen damit \textbf{äquidistant}:
+\[
+TE_k = TE_1 + (k-1)\,\Delta TE,\qquad k=1,\dots,N .
+\]
+Mit den Beispielwerten ergeben sich $TE_1=9.2\ms$, $TE_2=16.1\ms$ und $TE_3=23.0\ms$; der Reiter \ui{Info} bestätigt das als \ui{Act.\ TR/TE1/delta TE = 200 / 9.2 / 6.9}. Die tatsächlichen Werte stehen später auch in den DICOM-Metadaten.
+
+\noindent\begin{minipage}[t]{.44\linewidth}\vspace{0pt}
+\bild[trim={.211\width} {.033\height} {.601\width} {.583\height},clip]{PLAN_TRIPLE_ECHO.png}{Reiter \ui{Contrast} mit \ui{Echoes}, \ui{TE first} und \ui{echospacing}.}
+\end{minipage}\hfill
+\begin{minipage}[t]{.52\linewidth}\vspace{0pt}
+\bild[trim={.404\width} {.062\height} {.396\width} {.607\height},clip]{PLAN_TRIPLE_ECHO.png}{Reiter \ui{Info}: tatsächliche und minimal erreichbare Werte für TR, TE1 und Echoabstand.}
+\end{minipage}
+
+\begin{itemize}
+\item \textbf{Zwei Echos:} $TE_1$ und $TE_2=TE_1+\Delta TE$ sind frei wählbar. Tragen Sie die kleinere Zeit als \ui{TE first} und die Differenz als \ui{echospacing} ein.
+\item \textbf{Drei Echos:} Das mittlere Echo liegt automatisch in der Mitte, $TE_3-TE_1=2\,\Delta TE$. Für die $B_0$-Aufgabe planen Sie deshalb den \textbf{Echoabstand}, nicht die äußeren Zeiten einzeln.
+\item \textbf{Grenzen:} \ui{TE first} und \ui{echospacing} müssen über den Werten in \ui{Min.\ TR/TE1/delta TE} liegen; im Beispiel sind das $3.7\ms$ und $3.2\ms$. Der kleinste Echoabstand hängt von Auflösung und Bandbreite (\ui{Act.\ WFS / BW}) ab. Ein spätes letztes Echo kann ein längeres TR erzwingen.
+\item \textbf{Bildkomponenten:} Ob je Echo Magnitude, Phase oder beides gespeichert wird, stellen Sie unter \ui{Postproc} ein. Für die $B_0$-Karte benötigen Sie beide Komponenten.
+\end{itemize}
+
+\begin{note}
+\textbf{Beispielwerte sind keine Vorgabe.} Die gezeigten $9.2\ms$ und $6.9\ms$ stammen aus der vorbereiteten ExamCard. Berechnen Sie Ihre eigenen Werte aus dem im Spektrum gemessenen Frequenzabstand (Abschnitt \hyperref[spektrum]{08}) und dokumentieren Sie jede Änderung.
+\end{note}
+
+\newpage
+\heading{planung}{07 / BILDFELD UND KONTRAST}{Schichten planen und Flipwinkel variieren}
 \begin{enumerate}
 \item Laden Sie für diese Übungen ein vorbereitetes FFE-Protokoll, z.\,B. \seq{T1W\_FFE IP}, und öffnen Sie es per Doppelklick. Unter \ui{Summary} finden Sie Bildfeld (\emph{Field of View}, FOV), Voxel und Schichtanzahl; \ui{Geometry} enthält die detaillierte Geometrie.
 \item Variieren Sie zunächst Bildfeld, Position, Orientierung und Schichtanzahl. Die \textbf{roten Linien und Zahlen} in der Vorschau zeigen die geplanten Schichten. Wählen Sie schließlich eine Ebene, die \textbf{Wasser, Öl und den Übergang} abbildet.
-\item Öffnen Sie \ui{Contrast} für TR, TE, \ui{Echos} und \ui{Flip angle}. Untersuchen Sie ein bis zwei \textbf{von 90$^\circ$ verschiedene Flipwinkel} und vergleichen Sie die Bilder mit Ihrer Referenzaufnahme. Dokumentieren Sie jeden Winkel; halten Sie die übrigen Parameter für diesen Vergleich konstant.
+\item Öffnen Sie \ui{Contrast} für TR, TE, \ui{Echoes} und \ui{Flip angle} (Bedienung in Abschnitt \hyperref[parameter]{06}). Untersuchen Sie ein bis zwei \textbf{von 90$^\circ$ verschiedene Flipwinkel} und vergleichen Sie die Bilder mit Ihrer Referenzaufnahme. Dokumentieren Sie jeden Winkel; halten Sie die übrigen Parameter für diesen Vergleich konstant.
 \item Bestätigen Sie jede geänderte Einstellung mit \ui{Accept} und starten Sie mit \ui{Start Scan}. Beurteilen Sie Signal und Kontrast in Wasser und Öl.
 \end{enumerate}
 
@@ -186,7 +275,7 @@ Der Scanner benötigt die Position des Objekts auf dem Tisch. Verwenden Sie daf�
 \end{note}
 
 \newpage
-\heading{spektrum}{06 / FREQUENZBESTIMMUNG}{Wasser- und Fettpeak im Spektrum finden}
+\heading{spektrum}{08 / FREQUENZBESTIMMUNG}{Wasser- und Fettpeak im Spektrum finden}
 \begin{enumerate}
 \item Laden Sie \seq{T1W\_FFE spectrum}, übernehmen Sie die geplante Geometrie und starten Sie nach \ui{Accept} die Messung.
 \item Es öffnet sich die \ui{Monitoring Console} zur interaktiven $f_0$-Bestimmung. Lesen Sie die Resonanzfrequenz (Larmorfrequenz) in der Kopfzeile und die Frequenzpositionen der Peaks auf der horizontalen Achse ab.
@@ -221,7 +310,7 @@ $|\Delta f_\mathrm{cs}|$ [Hz] / $T_\mathrm{cs}$ [ms] & \textit{aus dem Gemisch} 
 \end{tabularx}
 
 \newpage
-\heading{dual}{07 / ZWEI ECHOS}{In-Phase und Out-of-Phase aufnehmen}
+\heading{dual}{09 / ZWEI ECHOS}{In-Phase und Out-of-Phase aufnehmen}
 Verwenden Sie den zuvor bestimmten Frequenzabstand, um die relative Phase von Wasser und Fett zu planen. Im vereinfachten Modell gelten
 \[
 TE_\mathrm{IP}=nT_\mathrm{cs},\qquad
@@ -232,7 +321,7 @@ Dabei ist $n$ ganzzahlig. Wählen Sie \textbf{positive, am Scanner erreichbare} 
 \subhead{Dual-Echo-Sequenz einstellen}
 \begin{enumerate}
 \item Laden Sie \seq{T1W\_FFE dual echo} und übernehmen Sie die festgelegte Geometrie. Verwenden Sie \textbf{zwei Echos derselben Akquisition}.
-\item Berechnen Sie aus Ihrem gemessenen Frequenzabstand geeignete OP-/IP-Zeiten. Öffnen Sie \ui{Contrast}, stellen Sie unter \ui{Echos} zwei Echos ein und wählen Sie bei \ui{TE} die Eingabe \ui{User defined}. Tragen Sie Ihre berechneten Zeiten ein; die Reihenfolge richtet sich nach den gewählten Zeiten.
+\item Berechnen Sie aus Ihrem gemessenen Frequenzabstand geeignete OP-/IP-Zeiten. Öffnen Sie \ui{Contrast}, stellen Sie \ui{Echoes} auf 2 und wählen Sie bei \ui{TE first} und \ui{echospacing} jeweils \ui{user defined} (Abschnitt \hyperref[parameter]{06}). Tragen Sie die kleinere Echozeit als \ui{TE first} und die Differenz beider Zeiten als \ui{echospacing} ein. Ob das erste Echo OP oder IP ist, ergibt sich aus Ihren Zeiten; prüfen Sie im Reiter \ui{Info} die umgesetzten Werte.
 \item Lassen Sie \textbf{Magnitudenbilder beider Echos} rekonstruieren und speichern. Verwenden Sie keine Fett- oder Wasserunterdrückung.
 \item Bestätigen Sie mit \ui{Accept}, starten Sie mit \ui{Start Scan} und öffnen Sie nach Messende das Ergebnis per Doppelklick. Vergleichen Sie beide Echos auf derselben Ebene: Wo ändert sich das Signal, insbesondere am Flüssigkeitsübergang?
 \end{enumerate}
@@ -247,10 +336,14 @@ Dabei ist $n$ ganzzahlig. Wählen Sie \textbf{positive, am Scanner erreichbare} 
 {\small\textbf{Weitere Beispielwerte aus DICOM:} TR $200\ms$, Flipwinkel $20^\circ$, Schichtdicke $10\,\mathrm{mm}$, Bildfeld $130\times130\,\mathrm{mm}^2$, rekonstruierte Matrix $512\times512$, Aufnahmemodus 3D. Die rekonstruierte Matrix ist nicht mit der akquirierten Auflösung gleichzusetzen. Übernehmen Sie das vorbereitete Protokoll und dokumentieren Sie Änderungen.}
 
 \newpage
-\heading{triple}{08 / DREI ECHOS}{Triple-Echo-Messung und optionale \texorpdfstring{$B_0$}{B0}-Karte}
-Berechnen Sie aus Ihrem gemessenen Frequenzabstand \textbf{drei geeignete, aufsteigende Echozeiten}. Verwenden Sie dazu die IP-/OP-Beziehungen aus dem vorherigen Abschnitt. Planen Sie für die optionale $B_0$-Aufgabe die beiden äußeren Echos mit annähernd gleichem chemischen Phasenzustand.
+\heading{triple}{10 / DREI ECHOS}{Triple-Echo-Messung und optionale \texorpdfstring{$B_0$}{B0}-Karte}
+Berechnen Sie aus Ihrem gemessenen Frequenzabstand \textbf{drei geeignete, aufsteigende Echozeiten}. Verwenden Sie dazu die IP-/OP-Beziehungen aus dem vorherigen Abschnitt. Die drei Echos liegen am Scanner äquidistant (Abschnitt \hyperref[parameter]{06}), daher gilt $TE_3-TE_1=2\,\Delta TE$. Planen Sie für die optionale $B_0$-Aufgabe die beiden äußeren Echos mit annähernd gleichem chemischen Phasenzustand:
+\[
+\Delta TE\approx\frac{k}{2}\,T_\mathrm{cs},\qquad k\in\mathbb{N}.
+\]
+Mit $k=1$ und $TE_1\approx nT_\mathrm{cs}$ erhalten Sie die Folge IP, OP, IP; mit $TE_1\approx(n+\tfrac12)T_\mathrm{cs}$ die Folge OP, IP, OP.
 
-Laden Sie \seq{T1W\_FFE triple echo}, übernehmen Sie dieselbe Geometrie und stellen Sie unter \ui{Contrast $\rightarrow$ Echos} drei Echos ein. Prüfen Sie mit der Betreuung, ob Ihre berechneten Zeiten am Scanner erreichbar sind, und tragen Sie sie bei \ui{TE $\rightarrow$ User defined} ein. Bestätigen Sie mit \ui{Accept} und starten Sie mit \ui{Start Scan}.
+Laden Sie \seq{T1W\_FFE triple echo}, übernehmen Sie dieselbe Geometrie und stellen Sie unter \ui{Contrast $\rightarrow$ Echoes} drei Echos ein. Tragen Sie $TE_1$ bei \ui{TE first} und $\Delta TE$ bei \ui{echospacing} ein, jeweils als \ui{user defined}; das mittlere Echo ergibt sich automatisch. Prüfen Sie im Reiter \ui{Info}, ob beide Werte über \ui{Min.\ TR/TE1/delta TE} liegen, und klären Sie Ihre Zeiten mit der Betreuung. Bestätigen Sie mit \ui{Accept} und starten Sie mit \ui{Start Scan}.
 
 Vergleichen Sie nach Messende die drei \textbf{Magnitudenbilder auf derselben Ebene}. Ordnen Sie jedem Echo anhand von $|\Delta f_\mathrm{cs}|\,TE$ den chemischen Phasenzustand zu. Beschreiben Sie Signaländerungen in Wasser, Öl und an ihrem Übergang.
 
@@ -287,7 +380,7 @@ Ein beliebiges IP-/OP-Phasenpaar vermischt chemische Phase und Feldphase. Verwen
 {\small Beginnen Sie mit einer signalstarken \textbf{Wasser-ROI außerhalb der Übergangszone}. Die optionale Auswertung ist eine Näherung. Das maskierte Unwrapping behandelt Phasensprünge, bestimmt jedoch keinen absoluten Feld-Offset.}
 
 \newpage
-\heading{varianten}{09 / VERGLEICHE UND MESSPROTOKOLL}{Die Messungen mit weiteren Objekten wiederholen}
+\heading{varianten}{11 / VERGLEICHE UND MESSPROTOKOLL}{Die Messungen mit weiteren Objekten wiederholen}
 Wiederholen Sie die Messfolge mit den folgenden Objekten. Beim Objektwechsel werden Lagerung, Einmessen und Survey erneut durchgeführt. Passen Sie die Planung an das neue Objekt an; halten Sie sie \textbf{innerhalb eines Vergleichs} konstant. Bei Objekten ohne zwei erkennbare Flüssigkeitsbereiche entfällt deren gemeinsame Darstellung.
 
 \begin{tabularx}{\linewidth}{@{}P{37mm}Y@{}}
@@ -333,7 +426,7 @@ Beobachtungen / Änderungen & \hrulefill \\[3mm]
 {\small\textbf{Vor dem Export:} Zusammengehörige Echos auf derselben Ebene, für $B_0$ zusätzlich direkte Phasen und Magnituden prüfen. Änderungen an Lagerung, Geometrie, Shim oder Referenzfrequenz festhalten.}
 
 \newpage
-\heading{export}{10 / DATENEXPORT}{Classic-DICOM auf den USB-Stick exportieren}
+\heading{export}{12 / DATENEXPORT}{Classic-DICOM auf den USB-Stick exportieren}
 \begin{enumerate}
 \item Öffnen Sie \ui{Patients $\rightarrow$ Administration} (\ui{F4}). Wählen Sie die Untersuchung Ihrer Gruppe und die zu exportierenden Messungen.
 \item Klicken Sie unten auf \ui{Disk Files}. Wählen Sie unter \ui{Destination} über \ui{Browse\ldots} den bereitgestellten USB-Stick bzw. dessen DICOM-Zielordner.
