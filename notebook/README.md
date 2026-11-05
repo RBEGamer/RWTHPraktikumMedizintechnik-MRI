@@ -47,11 +47,17 @@ Eine zusätzliche Referenzdatei zur Phasenkalibrierung ist nicht erforderlich. D
 
 Für B₀ werden zusätzlich die äußeren Phasenbilder Ihrer Triple-Echo-Aufnahme benötigt. Die Farbformel hängt nicht von der Bilddrehung ab. Folgen Sie den genauen Importhinweisen am Notebookende. Die [Dateiübersicht](daten/beispiel/README.md) erklärt die 20 mitgelieferten Beispielbilder.
 
+## Zweiter Datensatz: Knee-Phantom
+
+Unter `daten/knee/` liegen 10 DICOM-Bilder eines Knee-Phantoms auf einer Schichtebene: Magnitude und Phase der Dual-Echo-Aufnahme (6,9 / 13,8 ms) und der Triple-Echo-Aufnahme (9,2 / 16,1 / 23,0 ms), 864 × 864 Pixel. Die [Dateiübersicht](daten/knee/README.md) beschreibt die Auswahl der Schicht. Um die Aufgabenfassung damit zu rechnen, ersetzen Sie in der Ladezelle `daten/beispiel` durch `daten/knee` und die Referenzdatei durch `knee_dual_echo2_magnitude.dcm`.
+
 ## Abgabe und Musterlösung
 
 Speichern Sie Ihr Notebook mit den sichtbaren Eingangsbildern, dem Farbbild, den Signalanteilkarten, der B₀-Frequenzkarte und Ihren drei Kurzantworten. Die Abbildungen und Zahlen bleiben direkt in den Zellenausgaben erhalten; geben Sie das gespeicherte Notebook ab.
 
 [`experiment_loesung.ipynb`](experiment_loesung.ipynb) enthält die vollständige Musterlösung zur aktuellen Aufgabenfassung mit zusätzlichen Codekommentaren. Ihre **18 Codezellen** wurden mit den Beispieldaten unter Python 3.12 fehlerfrei ausgeführt. Die berechneten Ergebnisse und Abbildungen sind direkt im Lösungsnotebook sichtbar.
+
+[`experiment_loesung_knee.ipynb`](experiment_loesung_knee.ipynb) ist dieselbe Musterlösung für den Knee-Phantom-Datensatz in `daten/knee/`. Sie wurde unter Python 3.10 fehlerfrei ausgeführt; die Ausgaben sind gespeichert. Beim Knee-Phantom meldet die Kontrolle für fast alle Pixel eine Modellverletzung, weil das späte Echo durch T₂*-Zerfall überall dunkler ist als das frühe; der Text im Notebook erklärt das.
 
 ## Bei Fehlern
 

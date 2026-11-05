@@ -28,6 +28,7 @@ Work through the preparation script before the laboratory session. Use the scan 
 | [Philips ExamCard](dokumentation/MRSequenzExamCard/LfB_MR_Praktikum.ExamCard) | Prepared measurement sequences. |
 | [Jupyter notebook](notebook/experiment.ipynb) | Phase/magnitude colour blend, pixelwise magnitude-model signal fractions, and a triple-echo B₀ frequency map. See the [notebook instructions](notebook/README.md) for details. |
 | [DICOM example data](notebook/daten/beispiel/README.md) | Magnitude and phase images of one slice, with and without the metal button. |
+| [Knee phantom DICOM data](notebook/daten/knee/README.md) | Dual- and triple-echo magnitude and phase images of one slice of a knee phantom, with the matching solution notebook [experiment_loesung_knee.ipynb](notebook/experiment_loesung_knee.ipynb). |
 
 ## How to run the coding exercises locally?
 
