@@ -50,10 +50,10 @@
 \input{deckblatt.tex}
 
 \heading{registrierung}{01 / START UND REGISTRIERUNG}{MRT-Scananleitung}
-Diese Anleitung führt Sie vom Einrichten eines Phantomversuchs bis zum Export der Messdaten. Sie untersuchen Bildfeld und Flipwinkel, bestimmen den Wasser-Fett-Frequenzabstand und nehmen zwei sowie drei Echos auf. Die Dixon-Auswertung im Notebook vergleicht \textbf{eine gemeinsame Schichtebene}; die $B_0$-Auswertung ist optional.
+Diese Anleitung führt Sie vom Einrichten eines Phantomversuchs bis zum Export der Messdaten. Sie üben die Schichtplanung an einem T2-gewichteten Referenzbild, untersuchen den Flipwinkel, bestimmen den Wasser-Fett-Frequenzabstand und nehmen zwei sowie drei Echos auf. Die Dixon-Auswertung im Notebook vergleicht \textbf{eine gemeinsame Schichtebene}; die $B_0$-Auswertung ist optional.
 
 \begin{note}
-\textbf{Messfolge:} Phantom registrieren $\rightarrow$ Spule und Objekt aufbauen $\rightarrow$ Position einmessen $\rightarrow$ Survey aufnehmen $\rightarrow$ FOV und Flipwinkel untersuchen $\rightarrow$ Spektrum messen $\rightarrow$ zwei und drei Echos aufnehmen $\rightarrow$ Objektvarianten vergleichen $\rightarrow$ DICOM exportieren.
+\textbf{Messfolge:} Phantom registrieren $\rightarrow$ Spule und Objekt aufbauen $\rightarrow$ Position einmessen $\rightarrow$ Survey aufnehmen $\rightarrow$ T2W-Referenzbild planen $\rightarrow$ Flipwinkel untersuchen $\rightarrow$ Spektrum messen $\rightarrow$ zwei und drei Echos aufnehmen $\rightarrow$ Objektvarianten vergleichen $\rightarrow$ DICOM exportieren.
 \end{note}
 
 \subhead{Für jede Gruppe eine eigene Untersuchung anlegen}
@@ -165,7 +165,7 @@ Der Scanner benötigt die Position des Objekts auf dem Tisch. Verwenden Sie daf�
 \end{minipage}
 
 \begin{note}
-\textbf{Planungsgrundlage:} Der Survey liefert ein grobes Bild von Lage und Ausdehnung des Objekts. Alle weiteren Aufnahmen werden auf dieser Übersicht geplant. Nach einem Objektwechsel nehmen Sie einen neuen Survey auf.
+\textbf{Planungsgrundlage:} Der Survey liefert ein grobes Bild von Lage und Ausdehnung des Objekts. Alle weiteren Aufnahmen werden auf dieser Übersicht geplant; als erste davon ein T2-gewichtetes Referenzbild (Abschnitt \hyperref[planung]{07}). Nach einem Objektwechsel nehmen Sie einen neuen Survey auf.
 \end{note}
 
 \newpage
@@ -258,20 +258,27 @@ Mit den Beispielwerten ergeben sich $TE_1=9.2\ms$, $TE_2=16.1\ms$ und $TE_3=23.0
 \end{note}
 
 \newpage
-\heading{planung}{07 / BILDFELD UND KONTRAST}{Schichten planen und Flipwinkel variieren}
+\heading{planung}{07 / REFERENZBILD UND KONTRAST}{Schichten planen und Flipwinkel variieren}
+\subhead{Referenzbild mit einer T2W-Sequenz aus den Vorlagen}
+Üben Sie die Schichtplanung zunächst an einer vorgefertigten T2-gewichteten Turbo-Spin-Echo-Sequenz. Ihr kontrastreiches Bild dient den folgenden Messungen als Referenz.
 \begin{enumerate}
-\item Laden Sie für diese Übungen ein vorbereitetes FFE-Protokoll, z.\,B. \seq{T1W\_FFE IP}, und öffnen Sie es per Doppelklick. Unter \ui{Summary} finden Sie Bildfeld (\emph{Field of View}, FOV), Voxel und Schichtanzahl; \ui{Geometry} enthält die detaillierte Geometrie.
-\item Variieren Sie zunächst Bildfeld, Position, Orientierung und Schichtanzahl. Die \textbf{roten Linien und Zahlen} in der Vorschau zeigen die geplanten Schichten. Wählen Sie schließlich eine Ebene, die \textbf{Wasser, Öl und den Übergang} abbildet.
-\item Öffnen Sie \ui{Contrast} für TR, TE, \ui{Echoes} und \ui{Flip angle} (Bedienung in Abschnitt \hyperref[parameter]{06}). Untersuchen Sie ein bis zwei \textbf{von 90$^\circ$ verschiedene Flipwinkel} und vergleichen Sie die Bilder mit Ihrer Referenzaufnahme. Dokumentieren Sie jeden Winkel; halten Sie die übrigen Parameter für diesen Vergleich konstant.
-\item Bestätigen Sie jede geänderte Einstellung mit \ui{Accept} und starten Sie mit \ui{Start Scan}. Beurteilen Sie Signal und Kontrast in Wasser und Öl.
+\item Öffnen Sie die \ui{ExamCards} und wechseln Sie zu den Vorlagen im Reiter \ui{Philips}. Ziehen Sie eine T2-gewichtete TSE-Sequenz, z.\,B. \seq{T2W\_TSE}, in die linke Sequenzliste und öffnen Sie sie per Doppelklick.
+\item Unter \ui{Summary} stehen Bildfeld (\emph{Field of View}, FOV), Voxel und Schichtanzahl, unter \ui{Geometry} die Details. Verschieben und drehen Sie den Schichtstapel in den drei Planungsansichten auf dem Survey; die \textbf{roten Linien und Zahlen} zeigen die geplanten Schichten.
+\item Variieren Sie Bildfeld, Position, Orientierung und Schichtanzahl, bis das Objekt vollständig im Bildfeld liegt. Wählen Sie eine Ebene durch \textbf{Wasser, Öl und den Übergang} und beachten Sie die Messdauer in der Kopfzeile.
+\item Bestätigen Sie mit \ui{Accept}, starten Sie mit \ui{Start Scan} und öffnen Sie das Ergebnis im \ui{Review} (Abschnitt \hyperref[viewer]{05}). Dieses Bild ist Ihre \textbf{Referenzaufnahme}; notieren Sie Position, Orientierung, FOV und Schichtdicke.
 \end{enumerate}
 
-\bild[trim={.21\width} {.32\height} {.40\width} {.58\height},clip]{SEQUENZ_PARAMETERS.png}{Parameterbereich mit \ui{Summary}, \ui{Geometry} und \ui{Contrast}; hier ist \ui{Geometry} geöffnet.}
+\bild[trim={.21\width} {.47\height} {0\width} {.045\height},clip,width=.76\linewidth]{SEQUENCE_FOV_PLANNING.png}{Schichtplanung der Vorlage \seq{T2W\_TSE} auf dem Survey; rote Linien markieren die Schichten. Die T2W-TSE-Werte sind keine Vorgabe für die FFE-Messungen.}
 
-\bild[trim={.21\width} {.47\height} {0\width} {.045\height},clip]{SEQUENCE_FOV_PLANNING.png}{Beispiel einer Schichtplanung. Die roten Linien markieren Lage und Anzahl der Schichten. Die gezeigten T2W-TSE-Werte sind keine Vorgabe für die FFE-Messungen.}
+\subhead{Flipwinkel variieren}
+\begin{enumerate}
+\item Laden Sie aus \ui{Hospital $\rightarrow$ LfB $\rightarrow$ MR-Praktikum} ein vorbereitetes FFE-Protokoll, z.\,B. \seq{T1W\_FFE IP}. Übernehmen Sie Position, Orientierung, Schichtdicke und FOV der Referenzaufnahme.
+\item Messen Sie zunächst mit dem voreingestellten Flipwinkel. Öffnen Sie dann \ui{Contrast} für TR, TE, \ui{Echoes} und \ui{Flip angle} (Bedienung in Abschnitt \hyperref[parameter]{06}). Untersuchen Sie ein bis zwei \textbf{von 90$^\circ$ verschiedene Flipwinkel}; halten Sie die übrigen Parameter für diesen Vergleich konstant.
+\item Bestätigen Sie jede Änderung mit \ui{Accept} und starten Sie mit \ui{Start Scan}. Vergleichen Sie die Bilder untereinander und mit der T2W-Referenz auf derselben Schichtnummer; beurteilen Sie Signal und Kontrast in Wasser und Öl und dokumentieren Sie jeden Winkel.
+\end{enumerate}
 
 \begin{note}
-\textbf{Für die folgenden Echovergleiche:} Übernehmen Sie dieselbe Position, Orientierung, Schichtdicke, dasselbe FOV und dieselbe Matrix. Stellen Sie nach dem Flipwinkelversuch wieder den für die Multi-Echo-Messung vorgesehenen Winkel ein. Behalten Sie den vorbereiteten Aufnahmemodus bei: Eine gemeinsame Auswerteebene kann auch aus einem \textbf{3D-Schichtstapel} stammen.
+\textbf{Für die folgenden Echovergleiche:} Behalten Sie Position, Orientierung, Schichtdicke, FOV und Matrix bei und stellen Sie nach dem Flipwinkelversuch wieder den für die Multi-Echo-Messung vorgesehenen Winkel ein. Behalten Sie den vorbereiteten Aufnahmemodus bei: Eine gemeinsame Auswerteebene kann auch aus einem \textbf{3D-Schichtstapel} stammen.
 \end{note}
 
 \newpage
@@ -398,7 +405,7 @@ Weiteres organisches Objekt & Mitgebrachtes oder bereitgestelltes, von der Betre
 {\small
 \begin{tabularx}{\linewidth}{@{}Y P{21mm}P{22mm}P{23mm}P{20mm}P{20mm}@{}}
 \toprule
-\textbf{Objekt} & \textbf{Survey / FOV} & \textbf{Flipwinkel} & \textbf{Spektrum} & \textbf{2 Echos} & \textbf{3 Echos} \\
+\textbf{Objekt} & \textbf{Survey / T2W} & \textbf{Flipwinkel} & \textbf{Spektrum} & \textbf{2 Echos} & \textbf{3 Echos} \\
 \midrule
 Wasser & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
 Wasser/Öl & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
