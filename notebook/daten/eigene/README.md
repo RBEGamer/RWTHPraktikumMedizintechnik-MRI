@@ -1,11 +1,15 @@
 # Eigene DICOM-Echos
 
-Laden Sie hier Ihre Exporte hoch: Magnitude und Phase beider Echos auf derselben Schichtebene. Dateiendungen sind nicht erforderlich.
+Laden Sie hier Ihre Exporte hoch. Benötigt werden nur **Einzelbilder einer Schicht**: die Bilder der Dual-Echo- und der Triple-Echo-Aufnahme, jeweils Magnitude und Phase je Echo.
 
-Ändern Sie im Abschnitt „Daten laden und verstehen“ den Datenordner auf `daten/eigene/`, den Dateipfad auf eine eigene Magnitudendatei und die Aufnahme auf Ihren Katalogeintrag. Die Referenzdatei legt die gemeinsame Schichtebene fest; mehrere Schichten im Export sind daher erlaubt. Prüfen Sie die tatsächlichen Echozeiten und die IP-/OP-Zuordnung anhand Ihres Messprotokolls.
+Führen Sie im Notebook `mh.dateiliste("daten/eigene")` aus. Die Liste zeigt für jede Datei Aufnahme, Bildtyp, Echozeit und Schichtposition. Benennen Sie die zehn Dateien Ihrer gewählten Schicht danach mit festen Namen um; Echo 1 ist jeweils das Echo mit der kürzesten Echozeit:
 
-Zusätzliche Phasenkalibrierdateien werden nicht benötigt. Die Farbansicht zeigt die gemessene Phasendifferenz in zwei neutralen Farben. Rot und Blau legen keine Wasser-/Öl-Zuordnung fest. Aus den Magnituden werden die Modellanteile A und B sowie der relative Anteil B berechnet.
+```
+eigene_dual_echo1_magnitude.dcm    eigene_dual_echo1_phase.dcm
+eigene_dual_echo2_magnitude.dcm    eigene_dual_echo2_phase.dcm
+eigene_triple_echo1_magnitude.dcm  eigene_triple_echo1_phase.dcm
+eigene_triple_echo2_magnitude.dcm  eigene_triple_echo2_phase.dcm
+eigene_triple_echo3_magnitude.dcm  eigene_triple_echo3_phase.dcm
+```
 
-Führen Sie nach dem Wechsel alle folgenden Zellen erneut aus. Die Signalmaske wird automatisch berechnet; gedrehte Flaschenbilder benötigen keine andere Farbformel.
-
-Für die B₀-Frequenzkarte benötigen Sie außerdem die Phasenbilder der äußeren Triple-Echos derselben Aufnahme. Wählen Sie die Triple-Echo-Aufnahme im entsprechenden Notebook-Abschnitt und prüfen Sie den tatsächlichen Echoabstand sowie die chemische Gleichphasigkeit. Die B₀-Rechnung erfolgt ohne Maske.
+Setzen Sie anschließend in der Ladezelle `DATENORDNER = "daten/eigene"` und `PRAEFIX = "eigene"` und führen Sie alle Zellen erneut aus. Die Hilfsdatei prüft, dass alle Bilder zur selben Aufnahme und Schichtebene gehören.

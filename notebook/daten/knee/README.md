@@ -19,11 +19,9 @@ Alle Bilder haben 864 × 864 Pixel bei 0,266 mm Pixelabstand und 10 mm Schichtdi
 
 ## Im Notebook verwenden
 
-[`experiment_loesung_knee.ipynb`](../../experiment_loesung_knee.ipynb) lädt `knee_dual_echo2_magnitude.dcm` als Referenzdatei. Der Katalog liest Aufnahme, Echozeit, Bildtyp und Geometrie direkt aus den DICOM-Metadaten. Die Auswahlfelder zeigen die ursprünglichen Sequenznamen `T1W_FFE dual echo` und `T1W_FFE triple echo`.
+Setzen Sie in der Ladezelle von `experiment.ipynb` `DATENORDNER = "daten/knee"` und `PRAEFIX = "knee"`. Das Notebook lädt dann die vier Dual-Echo- und die sechs Triple-Echo-Bilder über ihre festen Dateinamen.
 
-Für die Aufgabenfassung `experiment.ipynb` genügt es, in der Ladezelle `daten/beispiel` durch `daten/knee` und die Referenzdatei durch `knee_dual_echo2_magnitude.dcm` zu ersetzen.
-
-Der Datensatz enthält ausschließlich Magnituden und direkte Phasen der Dual- und Triple-Echo-Aufnahmen. Die im Export ebenfalls vorhandenen Einzelaufnahmen `T1W_FFE IP` und `T1W_FFE OP` stammen aus getrennten Akquisitionen und sind deshalb nicht enthalten; das Notebook paart nur Echos derselben Akquisition.
+Der Datensatz enthält ausschließlich Magnituden und direkte Phasen der Dual- und Triple-Echo-Aufnahmen. Die im Export ebenfalls vorhandenen Einzelaufnahmen `T1W_FFE IP` und `T1W_FFE OP` stammen aus getrennten Akquisitionen und sind deshalb nicht enthalten. Beim Knee-Phantom ist das späte Echo durch T₂*-Zerfall fast überall dunkler als das frühe; die Kontrolle meldet deshalb für viele Pixel eine Modellverletzung.
 
 ## Ursprüngliche Dateien zuordnen
 

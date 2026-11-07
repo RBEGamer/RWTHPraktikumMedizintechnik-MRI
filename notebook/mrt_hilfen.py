@@ -1,20 +1,30 @@
-"""Hilfen für ein MRT-Praktikum auf genau einer Schichtebene.
+"""Hilfen für das MRT-Praktikum: Laden, Prüfen und Anzeigen.
 
-Die Dixon-, Hz- und ppm-Rechnungen stehen sichtbar im Notebook. Hier liegen
-DICOM-Import, Auswahl, Darstellung, Maskenkontrolle und maskiertes Unwrapping.
+Alle Formeln (chemische Umdrehungen, Phasendifferenz, Farbgewichte,
+Signalanteile, B0-Frequenz) stehen sichtbar im Notebook. Dieses Modul lädt
+die Dual- und Triple-Echo-Bilder mit festen Dateinamen, prüft, dass sie
+zusammengehören, und zeichnet die Abbildungen.
+
+Feste Dateinamen im Datenordner (PRAEFIX z. B. "wasser_oel"):
+    <PRAEFIX>_dual_echo1_magnitude.dcm    <PRAEFIX>_dual_echo1_phase.dcm
+    <PRAEFIX>_dual_echo2_magnitude.dcm    <PRAEFIX>_dual_echo2_phase.dcm
+    <PRAEFIX>_triple_echo1_magnitude.dcm  <PRAEFIX>_triple_echo1_phase.dcm
+    <PRAEFIX>_triple_echo2_magnitude.dcm  <PRAEFIX>_triple_echo2_phase.dcm
+    <PRAEFIX>_triple_echo3_magnitude.dcm  <PRAEFIX>_triple_echo3_phase.dcm
+Die Echos sind nach aufsteigender Echozeit nummeriert.
 """
 from pathlib import Path
 from types import SimpleNamespace
-from html import escape
-import csv
-import warnings
 import numpy as np
 import pydicom
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
-from scipy.ndimage import label
-from skimage.restoration import unwrap_phase
+from matplotlib.patches import Patch
 
+
+# ----------------------------------------------------------------------------
+# DICOM lesen
+# ----------------------------------------------------------------------------
 
 def _fg(ds, frame, sequence):
     """Per-frame vor Shared Functional Groups; niemals Frame-Metadaten erraten."""
@@ -77,9 +87,9 @@ def _metadata(ds, path, frame=None):
                 schichtdicke_mm=float(getattr(pix, 'SliceThickness', np.nan)),
                 referenzrahmen=str(ds.FrameOfReferenceUID))
     if not all(np.all(np.isfinite(meta[k])) for k in ['position_mm', 'orientierung', 'pixelabstand_mm']):
-        raise ValueError('Nicht endliche Geometrieangaben.')
+        raise ValueError(f'{path.name}: nicht endliche Geometrieangaben.')
     if np.any(meta['pixelabstand_mm'] <= 0):
-        raise ValueError('Pixelabstand muss positiv sein.')
+        raise ValueError(f'{path.name}: Pixelabstand muss positiv sein.')
     return meta
 
 
@@ -90,63 +100,10 @@ def gleiche_geometrie(a, b):
                     [('position_mm', 1e-3), ('orientierung', 1e-5), ('pixelabstand_mm', 1e-5)]))
 
 
-def katalog(ordner, referenz=None):
-    """Classic/Enhanced-MR einschließlich endungsloser Dateien inventarisieren.
-
-    Mit referenz (Classic-Dataset) wird exakt dessen Ebene beibehalten. Ohne
-    Referenz muss der Ordner eine einzige Geometrie enthalten. Es gibt keine
-    automatische Registrierung und keine stillschweigende Wahl einer Schicht.
-    """
-    root = Path(ordner)
-    if not root.is_dir():
-        raise ValueError(f'Datenordner fehlt: {root}')
-    records, errors = [], []
-    for path in sorted(root.rglob('*')):
-        if not path.is_file() or path.name == 'DICOMDIR':
-            continue
-        try:
-            ds = pydicom.dcmread(path, defer_size=1024)
-        except pydicom.errors.InvalidDicomError:
-            continue
-        if getattr(ds, 'Modality', '') != 'MR' or not hasattr(ds, 'Rows') or 'PixelData' not in ds:
-            continue
-        frames = range(int(ds.NumberOfFrames)) if hasattr(ds, 'NumberOfFrames') else [None]
-        for frame in frames:
-            try:
-                rec = _metadata(ds, path, frame)
-                if rec['komponente'] in {'MAGNITUDE', 'PHASE'}:
-                    records.append(rec)
-            except ValueError as exc:
-                errors.append(str(exc))
-    if errors:
-        warnings.warn(f'{len(errors)} Bild(er) übersprungen: {errors[0]}', stacklevel=2)
-    if referenz is not None:
-        ref = _metadata(referenz, Path('Referenz'))
-        records = [r for r in records if gleiche_geometrie(ref, r)]
-    if not records:
-        raise ValueError('Keine passenden MR-Echobilder auf der gewählten Ebene gefunden.')
-    if any(not gleiche_geometrie(records[0], r) for r in records):
-        raise ValueError('Mehrere Schichtebenen/Geometrien: zuerst eine Classic-Referenzdatei laden und referenz=dicom angeben.')
-    return records
-
-
-def uebersicht(records):
-    """Nur technische Metadaten anzeigen; keine vollständigen DICOM-Header."""
-    from IPython.display import HTML, display
-    rows = []
-    for r in records:
-        position = ', '.join(f'{x:.2f}' for x in r['position_mm'])
-        rows.append('<tr>' + ''.join(f'<td>{escape(str(x))}</td>' for x in
-                    [Path(r['datei']).name, r['aufnahme'], r['akquisition'], r['komponente'],
-                     r['echozeit_ms'], position]) + '</tr>')
-    display(HTML('<table><tr><th>Datei</th><th>Aufnahme</th><th>Akq.</th><th>Typ</th>'
-                 '<th>TE [ms]</th><th>Position [mm]</th></tr>' + ''.join(rows) + '</table>'))
-
-
-def _scale(ds, pixels, frame, kind):
+def _scale(ds, pixels, kind):
     """Eine physikalische Abbildung anwenden; RWVM hat Vorrang vor Rescale."""
-    rw = _fg(ds, frame, 'RealWorldValueMappingSequence') if frame is not None else ds
-    if frame is None and hasattr(ds, 'RealWorldValueMappingSequence'):
+    rw = ds
+    if hasattr(ds, 'RealWorldValueMappingSequence'):
         if len(ds.RealWorldValueMappingSequence) != 1:
             raise ValueError('Mehrere Real-World-Mappings: eindeutige Auswahl erforderlich.')
         rw = ds.RealWorldValueMappingSequence[0]
@@ -154,13 +111,12 @@ def _scale(ds, pixels, frame, kind):
         slope, intercept = float(rw.RealWorldValueSlope), float(rw.RealWorldValueIntercept)
         unit = str(rw.MeasurementUnitsCodeSequence[0].CodeValue).lower()
     else:
-        tr = _fg(ds, frame, 'PixelValueTransformationSequence') if frame is not None else ds
-        if hasattr(tr, 'ModalityLUTSequence') or hasattr(rw, 'RealWorldValueLUTData'):
+        if hasattr(ds, 'ModalityLUTSequence') or hasattr(rw, 'RealWorldValueLUTData'):
             raise ValueError('Nichtlineare Skalierung wird in dieser Lehrhilfe nicht unterstützt.')
-        if hasattr(tr, 'RescaleSlope') != hasattr(tr, 'RescaleIntercept'):
+        if hasattr(ds, 'RescaleSlope') != hasattr(ds, 'RescaleIntercept'):
             raise ValueError('Unvollständige Rescale-Skalierung.')
-        slope, intercept = float(getattr(tr, 'RescaleSlope', 1)), float(getattr(tr, 'RescaleIntercept', 0))
-        unit = str(getattr(tr, 'RescaleType', '')).lower()
+        slope, intercept = float(getattr(ds, 'RescaleSlope', 1)), float(getattr(ds, 'RescaleIntercept', 0))
+        unit = str(getattr(ds, 'RescaleType', '')).lower()
     if not np.all(np.isfinite([slope, intercept])) or slope == 0:
         raise ValueError('Ungültige DICOM-Skalierung.')
     array = pixels.astype(np.float64) * slope + intercept
@@ -175,225 +131,172 @@ def _scale(ds, pixels, frame, kind):
     return array, unit
 
 
-def lade(record):
-    ds = pydicom.dcmread(record['datei'])
+def lade_bild(pfad, komponente):
+    """Ein 2D-Bild laden; komponente ist 'MAGNITUDE' oder 'PHASE' (Phase in rad)."""
+    pfad = Path(pfad)
+    if not pfad.is_file():
+        raise FileNotFoundError(f'Datei nicht gefunden: {pfad}')
+    ds = pydicom.dcmread(pfad)
+    if hasattr(ds, 'NumberOfFrames') and int(ds.NumberOfFrames) > 1:
+        raise ValueError(f'{pfad.name}: Enhanced-DICOM mit mehreren Bildern. Bitte als Classic DICOM exportieren.')
+    meta = _metadata(ds, pfad)
+    if meta['komponente'] != komponente:
+        raise ValueError(f'{pfad.name}: erwartet {komponente}, gefunden {meta["komponente"]}. '
+                         'Dateinamen und Bildtyp prüfen.')
     pixels = ds.pixel_array
-    if record['frame'] is not None:
-        pixels = pixels[record['frame']]
     if pixels.ndim != 2:
-        raise ValueError('Für das Praktikum ist genau ein 2D-Bild erforderlich.')
-    data, unit = _scale(ds, pixels, record['frame'], record['komponente'])
-    return data, dict(record, einheit=unit)
+        raise ValueError(f'{pfad.name}: Für das Praktikum ist genau ein 2D-Bild erforderlich.')
+    data, unit = _scale(ds, pixels, komponente)
+    return data, dict(meta, einheit=unit)
 
 
-def echo_auswahl(records, aufnahme, modus='dixon'):
-    """Echo-Paar interaktiv wählen, mit konservativer Prüfung bei lade_paar.
+def lade_echos(ordner, praefix, aufnahme, anzahl):
+    """Magnitude und Phase aller Echos einer Aufnahme mit festen Dateinamen laden.
 
-    Dixon: erstes Feld ist OP, zweites IP; B0: zwei Phasen aufsteigend nach TE.
-    Die Voreinstellung ist ein Lehrvorschlag und keine automatische IP-Erkennung.
+    aufnahme: 'dual_echo' (anzahl=2) oder 'triple_echo' (anzahl=3).
+    Rückgabe mit den Feldern magnitude, phase, te_ms, meta (je eine Liste,
+    Index 0 = Echo 1) und f0_mhz (Scannerfrequenz in MHz).
     """
-    import ipywidgets as w
-    from IPython.display import display
-    kind = 'MAGNITUDE' if modus == 'dixon' else 'PHASE'
-    options = {}
-    for r in records:
-        if r['komponente'] == kind:
-            options[f"{r['aufnahme']} · Akq. {r['akquisition']}"] = r['gruppe']
-    if not options:
-        raise ValueError('Passendes Phasenpaar fehlt.' if kind == 'PHASE' else 'Magnitudenpaar fehlt.')
-    default = next((g for label_, g in options.items() if label_.startswith(aufnahme + ' ·')), next(iter(options.values())))
-    scan = w.Dropdown(options=list(options.items()), value=default, description='Aufnahme:', layout=w.Layout(width='650px'))
-    first = w.Dropdown(description='OP:' if modus == 'dixon' else 'Phase 1:', layout=w.Layout(width='650px'))
-    second = w.Dropdown(description='IP:' if modus == 'dixon' else 'Phase 2:', layout=w.Layout(width='650px'))
-    def refresh(change=None):
-        candidates = sorted([(i, r) for i, r in enumerate(records) if r['gruppe'] == scan.value and r['komponente'] == kind], key=lambda pair: pair[1]['echozeit_ms'])
-        opts = [(f"TE {r['echozeit_ms']:g} ms · {Path(r['datei']).name}" + (f" · Frame {r['frame']}" if r['frame'] is not None else ''), i) for i, r in candidates]
-        first.options = second.options = opts
-        if opts:
-            first.value, second.value = opts[0][1], opts[-1][1]
-    scan.observe(refresh, names='value')
-    refresh()
-    display(w.VBox([scan, first, second, w.HTML('Echo-Zuordnung anhand des Messprotokolls prüfen. Nach jeder Änderung die nachfolgenden Zellen erneut ausführen.')]))
-    return SimpleNamespace(records=records, scan=scan, first=first, second=second, modus=modus)
+    ordner = Path(ordner)
+    magnitude, phase, meta = [], [], []
+    for k in range(1, anzahl + 1):
+        m, mm = lade_bild(ordner / f'{praefix}_{aufnahme}{k}_magnitude.dcm', 'MAGNITUDE')
+        p, mp = lade_bild(ordner / f'{praefix}_{aufnahme}{k}_phase.dcm', 'PHASE')
+        if not np.isclose(mm['echozeit_ms'], mp['echozeit_ms'], rtol=0, atol=1e-6):
+            raise ValueError(f'Echo {k}: Magnitude und Phase haben verschiedene Echozeiten.')
+        magnitude.append(m)
+        phase.append(p)
+        meta.append(mm)
+    alle = meta
+    for mm in alle[1:]:
+        if mm['gruppe'] != alle[0]['gruppe'] or not gleiche_geometrie(mm, alle[0]):
+            raise ValueError('Die Echos stammen nicht aus derselben Aufnahme und Schichtebene.')
+    te_ms = [mm['echozeit_ms'] for mm in meta]
+    if te_ms[0] <= 0 or any(b <= a for a, b in zip(te_ms, te_ms[1:])):
+        raise ValueError(f'Echozeiten müssen positiv und aufsteigend nummeriert sein: {te_ms} ms.')
+    f0 = meta[0]['referenz_mhz']
+    if not np.isfinite(f0) or f0 <= 0:
+        raise ValueError('Scannerfrequenz (ImagingFrequency) fehlt in den DICOM-Daten.')
+    print(f"{meta[0]['aufnahme']} | {anzahl} Echos | TE = "
+          + ' / '.join(f'{t:g}' for t in te_ms) + f" ms | {magnitude[0].shape[0]} × "
+          f"{magnitude[0].shape[1]} Pixel | Ordner {ordner}")
+    return SimpleNamespace(magnitude=magnitude, phase=phase, te_ms=te_ms, meta=meta, f0_mhz=f0)
 
 
-def lade_paar(auswahl):
-    if auswahl.first.value is None or auswahl.second.value is None:
-        raise ValueError('Zwei geeignete Echos auswählen.')
-    a, b = (auswahl.records[box.value] for box in [auswahl.first, auswahl.second])
-    if a['gruppe'] != b['gruppe'] or not gleiche_geometrie(a, b):
-        raise ValueError('Echos gehören nicht zur gleichen Aufnahme und Schichtebene.')
-    if a['echozeit_ms'] <= 0 or b['echozeit_ms'] <= 0 or a['echozeit_ms'] == b['echozeit_ms']:
-        raise ValueError('Zwei unterschiedliche, positive Echozeiten erforderlich.')
-    if auswahl.modus == 'b0':
-        a, b = sorted([a, b], key=lambda r: r['echozeit_ms'])
-        if not np.isfinite(a['referenz_mhz']) or a['referenz_mhz'] <= 0 or not np.isclose(a['referenz_mhz'], b['referenz_mhz'], rtol=1e-8):
-            raise ValueError('Gleiche gültige Referenzfrequenz in beiden Phasenbildern erforderlich.')
-    x, ma = lade(a)
-    y, mb = lade(b)
-    if ma['einheit'] != mb['einheit']:
-        raise ValueError('Die Echos besitzen unterschiedliche Skalierungseinheiten.')
-    print(f"{a['aufnahme']} | TE {a['echozeit_ms']:g} / {b['echozeit_ms']:g} ms | eine Ebene, {x.shape[0]} × {x.shape[1]} Pixel")
-    return x, y, ma, mb
+def dateiliste(ordner):
+    """Alle DICOM-Bilder eines Ordners mit Aufnahme, Bildtyp und TE auflisten.
+
+    Hilft beim Umbenennen eigener Exporte in die festen Dateinamen.
+    """
+    zeilen = []
+    for path in sorted(Path(ordner).rglob('*')):
+        if not path.is_file():
+            continue
+        try:
+            ds = pydicom.dcmread(path, stop_before_pixels=True)
+            meta = _metadata(ds, path)
+        except Exception:
+            continue
+        zeilen.append((str(path.relative_to(ordner)), meta['aufnahme'], meta['komponente'],
+                       meta['echozeit_ms'], meta['position_mm'][2]))
+    if not zeilen:
+        print(f'Keine lesbaren DICOM-Bilder in {ordner}.')
+        return
+    print(f"{'Datei':40s} {'Aufnahme':28s} {'Typ':10s} {'TE [ms]':>8s} {'z [mm]':>8s}")
+    for z in zeilen:
+        print(f'{z[0]:40s} {z[1]:28s} {z[2]:10s} {z[3]:8.3f} {z[4]:8.2f}')
 
 
-def magnitude_zu_phase(records, meta):
-    found = [r for r in records if r['gruppe'] == meta['gruppe'] and r['komponente'] == 'MAGNITUDE'
-             and np.isclose(r['echozeit_ms'], meta['echozeit_ms'], rtol=0, atol=1e-6)
-             and gleiche_geometrie(r, meta)]
-    if len(found) != 1:
-        raise ValueError(f'Zur Phase wird genau eine passende Magnitude benötigt; gefunden: {len(found)}.')
-    return lade(found[0])[0]
+# ----------------------------------------------------------------------------
+# Vorbereitete Schritte, die keine Aufgabe sind
+# ----------------------------------------------------------------------------
+
+def ip_op_zuordnen(dual, umdrehung_1, umdrehung_2):
+    """IP- und OP-Echo anhand der berechneten chemischen Umdrehungen zuordnen.
+
+    Das Echo, dessen Umdrehungszahl näher an einer ganzen Zahl liegt, ist IP.
+    Rückgabe: ip, op, phase_ip, phase_op, meta_ip, meta_op.
+    """
+    abstand = [abs(u - round(u)) for u in (umdrehung_1, umdrehung_2)]
+    i_ip = 0 if abstand[0] < abstand[1] else 1
+    i_op = 1 - i_ip
+    umdrehungen = (umdrehung_1, umdrehung_2)
+    for i, name in ((i_ip, 'IP'), (i_op, 'OP')):
+        print(f'Echo {i + 1}: TE {dual.te_ms[i]:g} ms, {umdrehungen[i]:.2f} Umdrehungen → {name}')
+    if abstand[i_ip] > 0.2 or abs(abstand[i_op] - 0.5) > 0.2:
+        print('Hinweis: Die Echos sind nur grob IP/OP. Rechnung und Echozeiten prüfen.')
+    return (dual.magnitude[i_ip], dual.magnitude[i_op], dual.phase[i_ip], dual.phase[i_op],
+            dual.meta[i_ip], dual.meta[i_op])
 
 
-def phase_zu_magnitude(records, meta):
-    """Genau die zur Magnitude gehörende exportierte Phase in rad laden."""
-    found = [r for r in records if r['gruppe'] == meta['gruppe'] and r['komponente'] == 'PHASE'
-             and np.isclose(r['echozeit_ms'], meta['echozeit_ms'], rtol=0, atol=1e-6)
-             and gleiche_geometrie(r, meta)]
-    if len(found) != 1:
-        raise ValueError('Zur Magnitude wird genau eine passende Phase derselben Aufnahme, '
-                         f'Ebene und Echozeit benötigt; gefunden: {len(found)}. '
-                         'Die Phasenbilder beider Echos mit exportieren.')
-    return lade(found[0])
+def signalmaske(ip, op, phase_ip, phase_op, schwelle=0.15):
+    """Pixel mit genügend Signal in beiden Echos (Anteil des 99. Perzentils).
+
+    Rückgabe: maske (beide Echos gültig) und signal_ip (nur IP-Signal).
+    """
+    signal_ip = np.isfinite(ip) & (ip > schwelle * np.percentile(ip, 99))
+    maske = (signal_ip & np.isfinite(op) & np.isfinite(phase_ip) & np.isfinite(phase_op)
+             & (op > schwelle * np.percentile(op, 99)))
+    if not maske.any():
+        raise ValueError('Kein gemeinsamer signalstarker Bereich in beiden Echos.')
+    print(f'Auswertbare Pixel: {int(maske.sum())} von {maske.size}')
+    return maske, signal_ip
 
 
 def fenster(*images):
-    """Gemeinsame robuste Darstellungsgrenze; verändert keine Rechendaten."""
-    return (0., float(np.percentile(np.concatenate([a.ravel() for a in images]), 99)))
+    """Gemeinsame robuste Darstellungsgrenze (99. Perzentil); ändert keine Daten."""
+    return (0., float(np.nanpercentile(np.concatenate([a.ravel() for a in images]), 99)))
 
+
+# ----------------------------------------------------------------------------
+# Darstellung
+# ----------------------------------------------------------------------------
 
 def _extent(meta, shape):
     dy, dx = meta['pixelabstand_mm']
     return (-dx / 2, (shape[1] - .5) * dx, (shape[0] - .5) * dy, -dy / 2)
 
 
-def bild(data, titel, meta=None, grenzen=None, cmap='gray', ausschnitt=None):
+def bild(data, titel, meta=None, grenzen=None, cmap='gray'):
     fig, ax = plt.subplots(figsize=(6, 5), constrained_layout=True)
     limits = {} if grenzen is None else dict(vmin=grenzen[0], vmax=grenzen[1])
     im = ax.imshow(data, cmap=cmap, extent=_extent(meta, data.shape) if meta else None, **limits)
-    if np.ma.isMaskedArray(data):
-        ax.set_facecolor('#e8edf2')
-    if ausschnitt is not None:
-        x0, x1, y0, y1 = ausschnitt
-        ax.set_xlim(x0, x1)
-        ax.set_ylim(y1, y0)
-    ax.set(title=titel, xlabel='x in Schichtebene [mm]' if meta else 'Spalte [Pixel]', ylabel='y in Schichtebene [mm]' if meta else 'Zeile [Pixel]')
+    ax.set(title=titel, xlabel='x in Schichtebene [mm]' if meta else 'Spalte [Pixel]',
+           ylabel='y in Schichtebene [mm]' if meta else 'Zeile [Pixel]')
     fig.colorbar(im, ax=ax, shrink=.8)
     plt.show()
     return fig
 
 
-def vierer(ip, op, gross, klein, meta_ip, meta_op):
-    fig, axes = plt.subplots(2, 2, figsize=(10, 9), constrained_layout=True)
-    lim = fenster(ip, op)
-    for ax, data, title in zip(axes.ravel(), [ip, op, gross, klein],
-                              [f"IP · TE {meta_ip['echozeit_ms']:g} ms", f"OP · TE {meta_op['echozeit_ms']:g} ms", 'Größerer Modellanteil A', 'Kleinerer Modellanteil B']):
-        im = ax.imshow(data, cmap='gray', vmin=lim[0], vmax=lim[1], extent=_extent(meta_ip, data.shape))
-        if title.startswith('Kleinerer'):
-            ax.imshow(np.ma.masked_where(klein >= 0, np.ones_like(klein)), cmap=ListedColormap(['#ec5545']), alpha=.8, vmin=0, vmax=1, extent=_extent(meta_ip, data.shape))
-        ax.set(title=title, xlabel='x [mm]', ylabel='y [mm]')
-        fig.colorbar(im, ax=ax, shrink=.75, label='Signal [a.u.]')
-    fig.suptitle('Gleiche Grauwertskala · Rot: B < 0 (Modellverletzung)', fontsize=12)
+def eingangsbilder(echos, titel):
+    """Oben die Magnituden (gemeinsame Grauwertskala), unten die Phasen in rad."""
+    n = len(echos.magnitude)
+    fig, axes = plt.subplots(2, n, figsize=(4.6 * n, 8.4), constrained_layout=True, squeeze=False)
+    lim = fenster(*echos.magnitude)[1]
+    ext = _extent(echos.meta[0], echos.magnitude[0].shape)
+    for k in range(n):
+        te = echos.te_ms[k]
+        im_m = axes[0, k].imshow(echos.magnitude[k], cmap='gray', vmin=0, vmax=lim, extent=ext)
+        axes[0, k].set(title=f'Echo {k + 1} · TE {te:g} ms · Magnitude', xlabel='x [mm]', ylabel='y [mm]')
+        im_p = axes[1, k].imshow(echos.phase[k], cmap='twilight', vmin=-np.pi, vmax=np.pi, extent=ext)
+        axes[1, k].set(title=f'Echo {k + 1} · TE {te:g} ms · Phase', xlabel='x [mm]', ylabel='y [mm]')
+    fig.colorbar(im_m, ax=axes[0, :], shrink=.8, label='Signal [a.u.]')
+    fig.colorbar(im_p, ax=axes[1, :], shrink=.8, label='Phase [rad]')
+    fig.suptitle(f'{titel}: gleiche Grauwertskala für alle Magnituden, Phasen von −π bis π', fontsize=12)
     plt.show()
     return fig
 
 
-class ROI:
-    """Rechteck mit exklusiver oberer Indexgrenze und Live-Vorschau."""
-    def __init__(self, data, meta, signalmaske=None, start=(350, 410, 310, 360)):
-        import ipywidgets as w
-        from IPython.display import display
-        from io import BytesIO
-        self.data, self.meta = data, meta
-        self.signalmaske = np.ones(data.shape, bool) if signalmaske is None else np.asarray(signalmaske, bool)
-        if self.signalmaske.shape != data.shape:
-            raise ValueError('Signalmaske und Bild müssen dieselbe Form besitzen.')
-        h, width = data.shape
-        # Standardrechteck ist an die Beispieldaten angepasst; für kleinere Bilder zentral starten.
-        if not (0 <= start[0] < start[1] <= h and 0 <= start[2] < start[3] <= width):
-            start = (h//3, 2*h//3, width//3, 2*width//3)
-        self.y = w.IntRangeSlider(value=start[:2], min=0, max=h, description='Zeilen:', continuous_update=False, layout=w.Layout(width='600px'))
-        self.x = w.IntRangeSlider(value=start[2:], min=0, max=width, description='Spalten:', continuous_update=False, layout=w.Layout(width='600px'))
-        preview = w.Image(format='png', layout=w.Layout(max_width='600px'))
-        def redraw(change=None):
-            fig, ax = plt.subplots(figsize=(6, 5), constrained_layout=True)
-            ax.imshow(data, cmap='gray', extent=_extent(meta, data.shape), vmin=0, vmax=fenster(data)[1])
-            ax.imshow(np.ma.masked_where(~self.maske, np.ones_like(data)), cmap=ListedColormap(['#38bf78']), alpha=.4, vmin=0, vmax=1, extent=_extent(meta, data.shape))
-            ax.set(title=f'ROI ∩ Signalmaske · {self.maske.sum()} Pixel', xlabel='x [mm]', ylabel='y [mm]')
-            buffer = BytesIO()
-            fig.savefig(buffer, format='png', dpi=100)
-            preview.value = buffer.getvalue()
-            plt.close(fig)
-            self.figure = fig
-        self.y.observe(redraw, names='value')
-        self.x.observe(redraw, names='value')
-        display(w.VBox([self.y, self.x, w.HTML('Grün = ausgewertete Fläche. Danach die Zelle mit roi = … und die folgenden Rechnungen erneut ausführen.'), preview]))
-        redraw()
+def farbbild_anzeigen(rot, blau, helligkeit, maske, signal_ip, meta):
+    """Aus den im Notebook berechneten Kanälen ein RGB-Bild bauen und zeigen.
 
-    @property
-    def maske(self):
-        mask = np.zeros(self.data.shape, bool)
-        mask[self.y.value[0]:self.y.value[1], self.x.value[0]:self.x.value[1]] = True
-        return mask & self.signalmaske
-
-    @property
-    def grenzen(self):
-        return (*self.y.value, *self.x.value)
-
-
-def roi_waehlen(data, meta, signalmaske=None, start=(350, 410, 310, 360)):
-    return ROI(data, meta, signalmaske, start)
-
-
-def pruefe_roi(mask, zusammenhaengend=False):
-    if np.count_nonzero(mask) < 16:
-        raise ValueError('ROI enthält weniger als 16 gültige Pixel. Rechteck oder Signalschwelle ändern.')
-    components = label(mask)[1]
-    if zusammenhaengend and components != 1:
-        raise ValueError(f'ROI hat {components} getrennte Teile. Ein einziges zusammenhängendes Objektinnere wählen; Offsets sind sonst nicht vergleichbar.')
-    print(f'{mask.sum()} gültige Pixel, {components} zusammenhängende(r) Bereich(e).')
-
-
-def entfalte(wrapped, mask):
-    """2D-Unwrapping nur innerhalb einer geprüften, zusammenhängenden ROI."""
-    pruefe_roi(mask, zusammenhaengend=True)
-    if not np.all(np.isfinite(wrapped[mask])):
-        raise ValueError('Phasen innerhalb der Maske müssen endlich sein.')
-    masked = np.ma.array(wrapped, mask=~mask)
-    # rng hieß in älteren skimage-Versionen seed.
-    import inspect
-    keyword = 'rng' if 'rng' in inspect.signature(unwrap_phase).parameters else 'seed'
-    result = unwrap_phase(masked, **{keyword: 0})
-    return np.ma.filled(result, np.nan)
-
-
-def phasenvergleich(wrapped, unfolded, mask, meta):
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4.5), constrained_layout=True)
-    finite = unfolded[mask]
-    lo, hi = min(-np.pi, float(finite.min())), max(np.pi, float(finite.max()))
-    for ax, data, title in zip(axes, [wrapped, unfolded], ['Zirkuläre Differenz', 'Räumlich entfaltet (Offset offen)']):
-        im = ax.imshow(np.ma.masked_where(~mask, data), cmap='twilight', vmin=lo, vmax=hi, extent=_extent(meta, data.shape))
-        ax.set(title=title, xlabel='x [mm]', ylabel='y [mm]')
-        fig.colorbar(im, ax=ax, label='rad')
-    plt.show()
-    return fig
-
-
-def feldkarte(data, mask, meta, titel, grenze=.6):
-    y, x = np.nonzero(mask)
-    if len(y) == 0:
-        raise ValueError('Feldkarte benötigt eine nicht leere Maske.')
-    dy, dx = meta['pixelabstand_mm']
-    # Die ganze Schicht ist in der ROI-Ansicht dokumentiert; hier ROI vergrößern.
-    bounds = ((x.min()-10)*dx, (x.max()+10)*dx, (y.min()-10)*dy, (y.max()+10)*dy)
-    return bild(np.ma.masked_where(~mask, data), titel, meta, (-grenze, grenze), 'RdBu_r', bounds)
-
-
-def phasenblend_anzeigen(rgb, meta):
-    """Bereits im Notebook berechnete RGB-Werte anzeigen; keine Farbrechnung."""
-    from matplotlib.patches import Patch
-
+    Pixel ohne gültige Phase, aber mit IP-Signal werden grau, Hintergrund schwarz.
+    Rückgabe: das RGB-Bild (Zeilen × Spalten × 3, Werte 0 bis 1).
+    """
+    rgb = np.stack((rot, np.zeros_like(rot), blau), axis=-1)
+    rgb[~maske] = 0
+    grau = signal_ip & ~maske
+    rgb[grau] = np.asarray(helligkeit)[grau, None]
     fig, ax = plt.subplots(figsize=(7, 7.2), constrained_layout=True)
     ax.imshow(rgb, extent=_extent(meta, rgb.shape[:2]), interpolation='nearest')
     ax.set(title='Phase als Farbe · Magnitude als Helligkeit',
@@ -405,13 +308,11 @@ def phasenblend_anzeigen(rgb, meta):
     fig.supxlabel('Farbe: gemessene Phasenlage · Helligkeit: IP-Magnitude\n'
                   'Rot und Blau haben keine feste Wasser-/Öl-Bedeutung', fontsize=9)
     plt.show()
-    return fig
+    return rgb
 
 
 def signalanteile_anzeigen(anteil_a, anteil_b, b_prozent, maske, meta):
-    """Berechnete Signale und pixelweise Prozentkarte zeigen; keine Trennung."""
-    from matplotlib.patches import Patch
-
+    """Berechnete Modellanteile und pixelweise Prozentkarte zeigen; keine Trennung."""
     fig, axes = plt.subplots(1, 3, figsize=(15, 5.5), constrained_layout=True)
     lim = fenster(anteil_a[maske], anteil_b[maske])[1]
     for ax, data, title, cmap, vmax in zip(
@@ -436,24 +337,8 @@ def signalanteile_anzeigen(anteil_a, anteil_b, b_prozent, maske, meta):
     return fig
 
 
-def speichere_bild(fig, name):
-    path = Path('ergebnisse') / name
-    path.parent.mkdir(exist_ok=True)
-    fig.savefig(path, dpi=160, bbox_inches='tight')
-    print(f'Gespeichert: {path}')
-
-
-def protokoll(name, meta1, meta2, roi_box, **werte):
-    """Eine CSV-Zeile mit Auswahl, ROI und frei benannten Kennwerten sichern."""
-    row = dict(aufnahme=meta1['aufnahme'], datei_1=Path(meta1['datei']).name,
-               datei_2=Path(meta2['datei']).name, te_1_ms=meta1['echozeit_ms'], te_2_ms=meta2['echozeit_ms'],
-               referenz_mhz=meta1['referenz_mhz'], position_mm=';'.join(map(str, meta1['position_mm'])),
-               roi_zeilen_spalten=str(roi_box.grenzen), pixel=int(roi_box.maske.sum()),
-               flaeche_mm2=float(roi_box.maske.sum()*np.prod(meta1['pixelabstand_mm'])), **werte)
-    path = Path('ergebnisse') / name
-    path.parent.mkdir(exist_ok=True)
-    with path.open('w', newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=row.keys())
-        writer.writeheader()
-        writer.writerow(row)
-    print(f'Gespeichert: {path}')
+def b0_anzeigen(b0_hz, delta_te_s, meta):
+    """B0-Frequenzkarte ohne Maske im eindeutigen Bereich ±1/(2 ΔTE) zeigen."""
+    grenze = 1 / (2 * delta_te_s)
+    return bild(b0_hz, 'B₀: Frequenzabweichung [Hz] · ohne Maske / ohne Entfalten',
+                meta, (-grenze, grenze), 'RdBu_r')

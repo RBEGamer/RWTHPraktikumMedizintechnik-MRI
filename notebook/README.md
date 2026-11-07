@@ -1,13 +1,12 @@
 # Jupyter-Notebook zum MRT-Praktikum
 
-Sie untersuchen eine Wasser-/Ölflasche auf einer Schichtebene. Datenimport und Darstellung sind vorbereitet. Sie ergänzen vier Rechenschritte:
+Sie werten die Dual-Echo- und die Triple-Echo-Aufnahme einer Wasser-/Ölflasche auf einer Schichtebene aus. Laden, Prüfen und Anzeigen der Bilder sind vollständig vorbereitet. **Sie programmieren nur die Formeln** in fünf Aufgaben:
 
-1. Die relative Phase zwischen OP- und IP-Echo berechnen.
-2. Daraus ein Gesamtbild erzeugen: **Phase als Farbe, Magnitude als Helligkeit**.
-3. Aus den Magnituden den größeren Modellanteil A, den kleineren Modellanteil B und den Signalanteil B **für jedes gültige Pixel** berechnen.
-4. Aus der Phasendifferenz zwischen Echo 1 und Echo 3 der Triple-Echo-Aufnahme eine **B₀-Frequenzkarte in Hz** berechnen.
-
-Die automatische Signalmaske legt für die Signalanteile fest, welche Pixel auswertbar sind. Die B₀-Karte zeigt die ganze Schicht **ohne Maske und ohne räumliches Entfalten**; der signalarme Hintergrund ist dort verrauscht. Es müssen keine Bildbereiche mit Reglern gewählt werden.
+1. Chemische Umdrehungen aus Echozeit und Wasser-Fett-Frequenzabstand.
+2. Die relative Phase zwischen OP- und IP-Echo.
+3. Das Farbbild: **Phase als Farbe, Magnitude als Helligkeit**.
+4. Den größeren Modellanteil A, den kleineren Modellanteil B und den Signalanteil B **für jedes gültige Pixel**.
+5. Eine **B₀-Frequenzkarte in Hz** aus der Phasendifferenz zwischen Echo 1 und Echo 3 der Triple-Echo-Aufnahme.
 
 ## Vorbereitung
 
@@ -19,46 +18,50 @@ Ein Git-Klon enthält die Dateien, installiert aber noch keine Bibliotheken. Fü
 %pip install -r requirements-jupyterhub.txt
 ```
 
-Warten Sie das Ende der Installation ab. Starten Sie den Kernel neu und führen Sie danach die **Importzelle unter der Installationszelle** aus. Sind die Bibliotheken schon installiert, können Sie direkt mit den Importen beginnen.
-
-Wenn das JupyterHub-Profil mit dem [Dockerfile dieses Repositorys](../Dockerfile) gebaut wurde, sind die Bibliotheken bereits vorhanden. Wählen Sie dann **Python 3 (MRT-Praktikum)**. Hinweise zum lokalen Container stehen in der [Repository-README](../README.md#how-to-run-the-coding-exercises-locally).
+Starten Sie danach den Kernel neu und führen Sie die Importzelle aus. Wenn das JupyterHub-Profil mit dem [Dockerfile dieses Repositorys](../Dockerfile) gebaut wurde, sind die Bibliotheken bereits vorhanden; wählen Sie dann **Python 3 (MRT-Praktikum)**. Hinweise zum lokalen Container stehen in der [Repository-README](../README.md#how-to-run-the-coding-exercises-locally).
 
 ## Aufgaben bearbeiten
 
-Arbeiten Sie von oben nach unten mit **Shift + Enter**. Ergänzen Sie die mit `...` markierten Rechenschritte und Darstellungsaufrufe. Dazu gehören auch das Auslesen der Echozeiten und die Auswahl der Triple-Echo-Aufnahme. Ersetzen Sie alle Platzhalter im jeweiligen Block, bevor Sie ihn ausführen. Die Formeln und kurze Python-Hilfen stehen direkt darüber.
+Arbeiten Sie von oben nach unten mit **Shift + Enter**. In den Aufgabenzellen ersetzen Sie jedes `...` durch Ihre Formel; die Formel und kurze Python-Hilfen stehen direkt darüber. Alle anderen Zellen sind fertig und müssen nur ausgeführt werden.
 
-Die erste Aufnahme und die passenden Echos sind voreingestellt. Magnitude und Phase beider Echos werden in vier einzelnen Darstellungszellen geplottet. Nach einer Änderung der Echoauswahl müssen Sie die nachfolgenden Zellen erneut ausführen. Die Auswahlfelder funktionieren in einem laufenden Notebook, nicht in einer reinen Dateivorschau.
+Mit Ihren Umdrehungen aus Aufgabe 1 ordnet eine vorbereitete Zelle zu, welches Echo IP und welches OP ist. Nach Aufgabe 4 prüft eine Kontrollzelle Ihre Formeln. Für Kurzantworten doppelklicken Sie auf die Textzelle und schließen sie mit **Shift + Enter** ab. Speichern Sie regelmäßig mit **Strg + S / ⌘ + S**.
 
-Für Kurzantworten doppelklicken Sie auf die Textzelle und schließen sie mit **Shift + Enter** ab. Speichern Sie regelmäßig mit **Strg + S / ⌘ + S**.
+## Daten mit festen Dateinamen
 
-## Bilder richtig lesen
+Das Notebook lädt die Bilder ohne Auswahlfelder über feste Dateinamen. In der Ladezelle stehen nur der Datenordner und ein Präfix:
 
-IP enthält Wasser- **und** Fettsignal. Rot und Blau zeigen ausschließlich die gemessene OP-/IP-Phasendifferenz: nahe 0 wird blau, nahe ±π rot. Eine feste Zuordnung „Rot = Öl, Blau = Wasser“ wird nicht vorgenommen. Die Darstellung benötigt keine zusätzliche Kalibrierdatei.
+```python
+DATENORDNER = "daten/beispiel"
+PRAEFIX = "wasser_oel"
+```
 
-Die Signalanteile werden unabhängig von den Farben aus beiden Magnituden berechnet: A ist im idealen Modell der größere, B der kleinere Beitrag. Die Prozentkarte zeigt B/(A+B). A und B können ohne zusätzliches Wissen nicht eindeutig Wasser und Fett zugeordnet werden; die Prozentwerte sind keine Stoffkonzentrationen oder Volumenanteile.
+Daraus ergeben sich die zehn Dateinamen `<PRAEFIX>_dual_echo1_magnitude.dcm`, `<PRAEFIX>_dual_echo1_phase.dcm`, `<PRAEFIX>_dual_echo2_…` sowie `<PRAEFIX>_triple_echo1_…` bis `<PRAEFIX>_triple_echo3_phase.dcm`. Die Echos sind nach aufsteigender Echozeit nummeriert. Die Hilfsdatei prüft, dass Magnitude und Phase zusammenpassen und alle Echos aus derselben Aufnahme und Schichtebene stammen.
 
-Für die B₀-Karte sollte die chemische Phasendifferenz der äußeren Triple-Echos ungefähr null modulo 2π sein. Die zusätzliche gemessene Phasendifferenz liefert über den tatsächlichen Echoabstand die Frequenzabweichung. Ohne Entfalten bleiben die Werte modulo 1/ΔTE bestimmt; Sprünge können Phasenumbrüche sein.
+| Datensatz | `DATENORDNER` | `PRAEFIX` |
+| --- | --- | --- |
+| Wasser-/Ölflasche (Voreinstellung) | `daten/beispiel` | `wasser_oel` |
+| Wasser-/Ölflasche mit Metallknopf | `daten/beispiel` | `wasser_oel_mit_knopf` |
+| Knee-Phantom | `daten/knee` | `knee` |
+| Eigene Messdaten | `daten/eigene` | `eigene` |
 
 ## Eigene Daten
 
-Laden Sie die DICOM-Dateien unter `daten/eigene/` hoch. Benötigt werden Magnitude und Phase beider Echos auf derselben Schichtebene. Ersetzen Sie in der Ladezelle den Datenordner, die Referenzdatei und die Aufnahme.
+Benötigt werden nur **Einzelbilder einer Schicht**: die Bilder der Dual-Echo- und der Triple-Echo-Aufnahme, jeweils Magnitude und Phase je Echo, also zehn Bilddateien. Laden Sie die DICOM-Dateien in `daten/eigene/` hoch und führen Sie in einer neuen Notebook-Zelle `mh.dateiliste("daten/eigene")` aus. Die Liste zeigt für jede Datei Aufnahme, Bildtyp, Echozeit und Schichtposition. Benennen Sie die zehn Dateien Ihrer gewählten Schicht nach dem obigen Schema mit dem Präfix `eigene` um. Setzen Sie dann `DATENORDNER = "daten/eigene"` und `PRAEFIX = "eigene"` und führen Sie alle Zellen erneut aus. Setzen Sie in Aufgabe 1 Ihren im Spektrum gemessenen Frequenzabstand ein.
 
-Eine zusätzliche Referenzdatei zur Phasenkalibrierung ist nicht erforderlich. Der DICOM-Import prüft weiterhin Aufnahme, Echozeit, Geometrie und Phaseneinheit. Die neutrale Farbansicht funktioniert auch bei anderen Dateinamen, Aufnahmebezeichnungen und gedrehten Flaschenbildern.
+## Bilder richtig lesen
 
-Für B₀ werden zusätzlich die äußeren Phasenbilder Ihrer Triple-Echo-Aufnahme benötigt. Die Farbformel hängt nicht von der Bilddrehung ab. Folgen Sie den genauen Importhinweisen am Notebookende. Die [Dateiübersicht](daten/beispiel/README.md) erklärt die 20 mitgelieferten Beispielbilder.
+IP enthält Wasser- **und** Fettsignal. Rot und Blau zeigen ausschließlich die gemessene OP-/IP-Phasendifferenz: nahe 0 wird blau, nahe ±π rot. Eine feste Zuordnung „Rot = Öl, Blau = Wasser“ wird nicht vorgenommen.
 
-## Zweiter Datensatz: Knee-Phantom
+Die Signalanteile werden unabhängig von den Farben aus beiden Magnituden berechnet: A ist im idealen Modell der größere, B der kleinere Beitrag. A und B können ohne zusätzliches Wissen nicht eindeutig Wasser und Fett zugeordnet werden; die Prozentwerte sind keine Stoffkonzentrationen.
 
-Unter `daten/knee/` liegen 10 DICOM-Bilder eines Knee-Phantoms auf einer Schichtebene: Magnitude und Phase der Dual-Echo-Aufnahme (6,9 / 13,8 ms) und der Triple-Echo-Aufnahme (9,2 / 16,1 / 23,0 ms), 864 × 864 Pixel. Die [Dateiübersicht](daten/knee/README.md) beschreibt die Auswahl der Schicht. Um die Aufgabenfassung damit zu rechnen, ersetzen Sie in der Ladezelle `daten/beispiel` durch `daten/knee` und die Referenzdatei durch `knee_dual_echo2_magnitude.dcm`.
+Für die B₀-Karte sollte die chemische Phasendifferenz der äußeren Triple-Echos ungefähr null modulo 2π sein. Die Karte zeigt die ganze Schicht ohne Maske und ohne räumliches Entfalten; die Werte sind nur modulo 1/ΔTE bestimmt.
 
 ## Abgabe und Musterlösung
 
-Speichern Sie Ihr Notebook mit den sichtbaren Eingangsbildern, dem Farbbild, den Signalanteilkarten, der B₀-Frequenzkarte und Ihren drei Kurzantworten. Die Abbildungen und Zahlen bleiben direkt in den Zellenausgaben erhalten; geben Sie das gespeicherte Notebook ab.
+Speichern Sie Ihr Notebook mit allen Abbildungen und Ihren drei Kurzantworten und geben Sie das gespeicherte Notebook ab.
 
-[`experiment_loesung.ipynb`](experiment_loesung.ipynb) enthält die vollständige Musterlösung zur aktuellen Aufgabenfassung mit zusätzlichen Codekommentaren. Ihre **18 Codezellen** wurden mit den Beispieldaten unter Python 3.12 fehlerfrei ausgeführt. Die berechneten Ergebnisse und Abbildungen sind direkt im Lösungsnotebook sichtbar.
-
-[`experiment_loesung_knee.ipynb`](experiment_loesung_knee.ipynb) ist dieselbe Musterlösung für den Knee-Phantom-Datensatz in `daten/knee/`. Sie wurde unter Python 3.10 fehlerfrei ausgeführt; die Ausgaben sind gespeichert. Beim Knee-Phantom meldet die Kontrolle für fast alle Pixel eine Modellverletzung, weil das späte Echo durch T₂*-Zerfall überall dunkler ist als das frühe; der Text im Notebook erklärt das.
+[`experiment_loesung.ipynb`](experiment_loesung.ipynb) enthält die vollständige Musterlösung mit zusätzlichen Codekommentaren. Sie wurde mit den Beispieldaten der Wasser-/Ölflasche unter Python 3.12 fehlerfrei ausgeführt; alle Ergebnisse und Abbildungen sind gespeichert.
 
 ## Bei Fehlern
 
-Prüfen Sie zuerst, ob alle vorherigen Zellen ausgeführt und alle `...` im aktuellen Aufgabenblock ersetzt wurden. Bei „Datei nicht gefunden“ kontrollieren Sie die Pfade; Notebook, `mrt_hilfen.py`, Datenordner und Referenzdatei müssen zusammen verfügbar sein. Zeigen Sie bei weiteren Problemen die vollständige Fehlermeldung.
+Prüfen Sie zuerst, ob alle vorherigen Zellen ausgeführt und alle `...` in der aktuellen Aufgabenzelle ersetzt wurden. Bei „Datei nicht gefunden“ kontrollieren Sie `DATENORDNER`, `PRAEFIX` und die Dateinamen; Notebook, `mrt_hilfen.py` und der Ordner `daten/` müssen zusammen im Ordner `notebook/` liegen. Zeigen Sie bei weiteren Problemen die vollständige Fehlermeldung.

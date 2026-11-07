@@ -19,14 +19,12 @@ Dieser Ordner enthält 20 DICOM-Bilder der Wasser-/Ölflasche auf derselben geom
 
 ## Im Notebook verwenden
 
-Die erste Notebook-Zelle lädt `wasser_oel_dual_echo2_magnitude.dcm`. Der Katalog liest Aufnahme, Echozeit, Bildtyp und Geometrie direkt aus den DICOM-Metadaten. Die Auswahlfelder zeigen weiterhin die ursprünglichen Sequenznamen, etwa `T1W_FFE dual echo button` für die Aufnahme mit Knopf; daneben erscheinen die neuen Dateinamen.
+Das Notebook lädt die Bilder über feste Dateinamen. Voreingestellt sind `DATENORDNER = "daten/beispiel"` und `PRAEFIX = "wasser_oel"`; für die Flasche mit Metallknopf setzen Sie `PRAEFIX = "wasser_oel_mit_knopf"`. Pro Variante werden die vier Dual-Echo- und die sechs Triple-Echo-Bilder geladen.
 
-Der Datensatz enthält ausschließlich Magnituden und direkte Phasen der Dual- und Triple-Echo-Aufnahmen. Die Wasser-/Öl-Zuordnung erfolgt anhand der bekannten Befüllung und dokumentierten Lagerung, bei den Beispieldaten oben Öl und unten Wasser. Die Bildhelligkeit allein legt diese Zuordnung nicht fest; auch die neutrale Farbansicht ist keine Stoffkennzeichnung.
-
-Die aktuelle Notebook-Aufgabe startet mit der Dual-Echo-Aufnahme ohne Knopf. Für den Phasen-Magnitude-Blend werden nur die Magnituden und Phasen der beiden Echos benötigt. Rot und Blau kennzeichnen Phasenlagen, ohne feste Wasser-/Öl-Zuordnung. Die Magnitudenrechnung liefert größere und kleinere Modellanteile A/B. Zusätzliche Kalibrierdateien sind nicht erforderlich.
+Die Wasser-/Öl-Zuordnung erfolgt anhand der bekannten Befüllung und dokumentierten Lagerung, bei den Beispieldaten oben Öl und unten Wasser. Die Bildhelligkeit allein legt diese Zuordnung nicht fest; auch die neutrale Farbansicht ist keine Stoffkennzeichnung.
 
 ## Ursprüngliche Dateien zuordnen
 
 [manifest.csv](manifest.csv) enthält für jedes Bild den aktuellen Dateinamen (`datei`), den ursprünglichen Exportnamen (`original_datei`), die Aufnahme, die Bildkomponente, die tatsächliche TE und die Schichtposition. Die Komponentenkürzel bedeuten `M` = Magnitude und `P` = Phase.
 
-Eigene Exporte gehören in den benachbarten Ordner `../eigene/`. Sie dürfen ihre ursprünglichen Dateinamen behalten, weil der Import die DICOM-Metadaten verwendet.
+Eigene Exporte gehören in den benachbarten Ordner `../eigene/` und werden dort nach demselben Schema mit dem Präfix `eigene` benannt.
