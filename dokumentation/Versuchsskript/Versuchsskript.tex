@@ -85,6 +85,9 @@
 \newcommand{\OP}{_{\mathit{OP}}}
 \newcommand{\unit}[1]{\,\mathrm{#1}}
 
+% DOI-Link im Literaturverzeichnis
+\newcommand{\doi}[1]{\href{https://doi.org/#1}{doi:\,#1}}
+
 \begin{document}
 \thispagestyle{titel}
 
@@ -127,16 +130,16 @@ Also: die spektrale Fettsuppression unterdrückt das Fettsignal während der Akq
 Magnetfeldinhomogenitäten entstehen immer dann, wenn ein Patient/Objekt eine von Luft verschiedene Suszeptibilität hat. (Also eigentlich immer! In den meisten Fällen stört das die Bildgebung aber nicht relevant.) Anfällig für etwas stärkere Feldinhomogenitäten sind \glqq nicht zusammenhängende\grqq\ Anatomien mit vielen Luft-Gewebe-Grenzen, die zum Beispiel bei der Brustbildgebung (Lunge), der simultanen Bildgebung beider Beine, oder im Gastrointestinaltrakt auftreten können. Besonders starke Magnetfeldinhomogenitäten können in der Nähe von metallischem Fremdmaterial (z.\,B.\ künstliche Kniegelenke, künstliche Hüftgelenke) vorhanden sein. Hier versagen spektrale Fettsuppressionstechniken häufig völlig.
 
 \begin{merke}
-CSE-MRT-Sequenzen tragen in der MRT-Welt übrigens auch den Namen \glqq Dixon\grqq-Sequenzen, nach ihrem Erfinder W.~Thomas Dixon, der dazu 1984 eine grundlegende wissenschaftliche Arbeit veröffentlicht hat.
+CSE-MRT-Sequenzen tragen in der MRT-Welt übrigens auch den Namen \glqq Dixon\grqq-Sequenzen, nach ihrem Erfinder W.~Thomas Dixon, der dazu 1984 eine grundlegende wissenschaftliche Arbeit veröffentlicht hat~\cite{dixon1984}.
 \end{merke}
 
 \subsection{Fettquantifizierung in der Leberbildgebung}
-Ein weiteres Anwendungsbeispiel für die CSE-MRT aus dem klinischen Alltag ist die Leberverfettung, die im Zusammenhang mit der MASLD-Erkrankung (\glqq metabolische Dysfunktion-assoziierte steatotische Lebererkrankung\grqq) auftritt. Eine Leberverfettung kann die erste Stufe einer ganzen Erkrankungs-Kaskade darstellen, die Leberzirrhose, Leberversagen und hepatozelluläre Karzinome bedingen kann. Sie stellt auch einen Risikofaktor für das metabolische Syndrom, Typ-2-Diabetes und kardiovaskuläre Mortalität dar. Die Therapie der Steatosis hepatis umfasst in der Regel eine Kombination aus Lebensstiländerungen und medikamentöser Behandlung. Häufig bleibt eine Leberverfettung bzw.\ MASLD allerdings leider lange unerkannt, zumindest im Frühstadium. Eine frühzeitige Diagnose und Behandlung sind wegen der möglichen Folgen jedoch entscheidend. Der Fettgehalt der Leber wurde traditionell über eine Biopsie festgestellt. Dies ist allerdings sehr invasiv, und außerdem kann so nur ein lokaler Fettgehalt bestimmt werden. Auch die MRT-Bildgebung kann eine Leberverfettung diagnostizieren. Dazu reicht es allerdings nicht, das reine Vorhandensein von Fett zu bejahen oder zu verneinen wie vielleicht bei der Tumorcharakterisierung. Stattdessen muss der genaue Fettgehalt des Organs quantifiziert werden, genauer gesagt, die sogenannte \glqq Proton Density Fat Fraction\grqq\ (PDFF). Dies kann CSE-MRT leisten, und zwar auf nicht invasive Weise! Moderne Sequenzen zur Fettquantifizierung erfassen dabei die PDFF über die ganze Leber in einem einzigen Atem-Anhalter des Patienten. Abbildung~\ref{fig:pdff} zeigt beispielhaft mittels CSE-MRT gewonnene PDFF-Karten der Leber für verschiedene Grade an Leberverfettung. [Starekova 2021]
+Ein weiteres Anwendungsbeispiel für die CSE-MRT aus dem klinischen Alltag ist die Leberverfettung, die im Zusammenhang mit der MASLD-Erkrankung (\glqq metabolische Dysfunktion-assoziierte steatotische Lebererkrankung\grqq) auftritt. Eine Leberverfettung kann die erste Stufe einer ganzen Erkrankungs-Kaskade darstellen, die Leberzirrhose, Leberversagen und hepatozelluläre Karzinome bedingen kann. Sie stellt auch einen Risikofaktor für das metabolische Syndrom, Typ-2-Diabetes und kardiovaskuläre Mortalität dar. Die Therapie der Steatosis hepatis umfasst in der Regel eine Kombination aus Lebensstiländerungen und medikamentöser Behandlung. Häufig bleibt eine Leberverfettung bzw.\ MASLD allerdings leider lange unerkannt, zumindest im Frühstadium. Eine frühzeitige Diagnose und Behandlung sind wegen der möglichen Folgen jedoch entscheidend. Der Fettgehalt der Leber wurde traditionell über eine Biopsie festgestellt. Dies ist allerdings sehr invasiv, und außerdem kann so nur ein lokaler Fettgehalt bestimmt werden. Auch die MRT-Bildgebung kann eine Leberverfettung diagnostizieren. Dazu reicht es allerdings nicht, das reine Vorhandensein von Fett zu bejahen oder zu verneinen wie vielleicht bei der Tumorcharakterisierung. Stattdessen muss der genaue Fettgehalt des Organs quantifiziert werden, genauer gesagt, die sogenannte \glqq Proton Density Fat Fraction\grqq\ (PDFF). Dies kann CSE-MRT leisten, und zwar auf nicht invasive Weise! Moderne Sequenzen zur Fettquantifizierung erfassen dabei die PDFF über die ganze Leber in einem einzigen Atem-Anhalter des Patienten. Abbildung~\ref{fig:pdff} zeigt beispielhaft mittels CSE-MRT gewonnene PDFF-Karten der Leber für verschiedene Grade an Leberverfettung~\cite{starekova2021}.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{pdff_leber_starekova.png}
-\caption{PDFF-Karten für unterschiedliche Grade an Leberverfettung, die mittels CSE-MRT gewonnen wurden. (aus Starekova et al.)}
+\caption{PDFF-Karten für unterschiedliche Grade an Leberverfettung, die mittels CSE-MRT gewonnen wurden. (aus Starekova et al.~\cite{starekova2021})}
 \label{fig:pdff}
 \end{figure}
 
@@ -296,16 +299,13 @@ F &= \frac{1}{2}\left[\frac{1}{2}\Bigl(S_1 + S_3\,e^{-2i\dphi}\Bigr) - S_2\,e^{-
 \end{align*}
 Ein praktisches Problem ist das sogenannte \emph{Phase Wrapping}: Die Phase ist nur auf einem Intervall der Länge $2\pi$ definiert. Werden die Feldinhomogenität oder die Echozeit so groß, dass die Phase dieses Intervall überschreitet, treten in $\dphi$ Sprünge auf. Diese müssen mit einem \emph{Phase-Unwrapping}-Algorithmus korrigiert werden, bevor die Wasser-Fett-Trennung korrekt durchgeführt werden kann.
 
-{\color{dunkel}Weitere Infos unter Ma, Dixon techniques for water and fat imaging, Journal of Magnetic Resonance Imaging 2008; 28:543--558.\par}
+{\color{dunkel}Weitere Infos: Ma, \glqq Dixon techniques for water and fat imaging\grqq~\cite{ma2008}.\par}
 
 \subsection{Ausblick}
 Die in-phase oder out-of-phase Zeitpunkte bieten eine analytische Lösung des Wasser-Fett-Separationsproblems, jedoch sind sie im Hinblick auf das Signal-Rausch-Verhältnis nicht ideal. \glqq Moderne\grqq\ Wasser-Fett-Separations-Algorithmen basieren zumeist auf iterativen Rekonstruktionen und nutzen mehrere, enger zusammenliegende Echozeiten. Dadurch können sie auch noch auf weitere \glqq confounding effects\grqq\ korrigieren.
 
 % ===================================================================== 4
 \section{Ablaufplan des Praktikums (Präsenz)}\label{sec:ablauf}
-{\color{linie}\rule{\linewidth}{0.6pt}}\par
-{\color{warnrot}\itshape\large\textbf{Hinweis:} Dieser Ablaufplan hat den Stand vom 29.10.2026. Bis zum 03.11.2026 kann es noch Änderungen geben. Danach gilt die finale Version, die wir rechtzeitig im Moodle Lernraum bereitstellen.\par}
-{\color{linie}\rule{\linewidth}{0.6pt}}\par
 
 \subsection*{Teil 1: Briefing \& Sicherheitsunterweisung (30 Min)}
 \absatzkopf{Briefing:}
@@ -396,8 +396,25 @@ Die Studierenden führen die Messungen selbstständig unter Aufsicht durch.
 \begin{enumerate}
 \item Berechnen Sie die Larmorfrequenz von Protonen bei 1.5 Tesla und bei 7 Tesla.
 \item Das chemische Shift zwischen Fett und Wasser beträgt 3.5\,ppm. Berechnen Sie die Frequenzdifferenz $\Delta f$ (in Hz) für einen 3 Tesla Scanner.
-\item Zu welchen Echozeiten (TE in ms) sind Fett und Wasser bei 3 Tesla exakt \glqq Out-of-Phase\grqq\ (erste zwei Zeitpunkte)?
+\item Zu welchen Echozeiten (TE in ms) sind Fett und Wasser bei 3 Tesla exakt \glqq In-Phase\grqq\ und zu welchen exakt \glqq Out-of-Phase\grqq? Berechnen Sie jeweils mindestens die ersten fünf Echozeiten ($\TE > 0$).
 \item Gegeben sei: $S\IP = 100$ und $S\OP = 20$. Berechnen Sie den Signalanteil von Wasser und Fett (unter der Annahme $W > F$).
 \end{enumerate}
+
+% ===================================================================== Literatur
+\begingroup\raggedright
+\begin{thebibliography}{9}
+\bibitem{dixon1984}
+W.~T. Dixon: Simple proton spectroscopic imaging. \emph{Radiology} 153(1):189--194, 1984.
+\doi{10.1148/radiology.153.1.6089263}
+
+\bibitem{ma2008}
+J.~Ma: Dixon techniques for water and fat imaging. \emph{Journal of Magnetic Resonance Imaging} 28(3):543--558, 2008.
+\doi{10.1002/jmri.21492}
+
+\bibitem{starekova2021}
+J.~Starekova, D.~Hernando, P.~J. Pickhardt, S.~B. Reeder: Quantification of Liver Fat Content with CT and MRI: State of the Art. \emph{Radiology} 301(2):250--262, 2021.
+\doi{10.1148/radiol.2021204288}
+\end{thebibliography}
+\endgroup
 
 \end{document}
