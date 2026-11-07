@@ -25,6 +25,7 @@ Work through the preparation script before the laboratory session. Use the scan 
 | --- | --- |
 | [Preparation script](dokumentation/Versuchsskript/Versuchsskript.pdf) | Background and exercises for the MRI experiment. |
 | [Scan guide](dokumentation/Versuchsdurchfuehrung/Versuchsdurchfuehrung.pdf) | Scanner operation, acquisition planning, measurements, and DICOM export. The [LaTeX source](dokumentation/Versuchsdurchfuehrung/Versuchsdurchfuehrung.tex) is included. |
+| [Quiz](dokumentation/Quiz/README.md) | Thirteen multiple-choice questions for self-assessment: five on the preparation script, five on the Python steps in the notebook, one on the B₀ map and two on operating the scanner, with solutions. |
 | [Philips ExamCard](dokumentation/MRSequenzExamCard/LfB_MR_Praktikum.ExamCard) | Prepared measurement sequences. |
 | [Jupyter notebook](notebook/experiment.ipynb) | Phase/magnitude colour blend, pixelwise magnitude-model signal fractions, and a triple-echo B₀ frequency map. Loading and plotting are prepared; students only program the formulas. See the [notebook instructions](notebook/README.md) for details. |
 | [DICOM example data](notebook/daten/beispiel/README.md) | Magnitude and phase images of one slice, with and without the metal button. |

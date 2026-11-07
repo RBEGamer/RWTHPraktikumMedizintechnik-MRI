@@ -2,7 +2,7 @@
 
 Sie werten die Dual-Echo- und die Triple-Echo-Aufnahme einer Wasser-/Ölflasche auf einer Schichtebene aus. Laden, Prüfen und Anzeigen der Bilder sind vollständig vorbereitet. **Sie programmieren nur die Formeln** in fünf Aufgaben:
 
-1. Chemische Umdrehungen aus Echozeit und Wasser-Fett-Frequenzabstand.
+1. Die Phasenverschiebung von Fett gegenüber Wasser in Grad aus Echozeit und Wasser-Fett-Frequenzabstand.
 2. Die relative Phase zwischen OP- und IP-Echo.
 3. Das Farbbild: **Phase als Farbe, Magnitude als Helligkeit**.
 4. Den größeren Modellanteil A, den kleineren Modellanteil B und den Signalanteil B **für jedes gültige Pixel**.
@@ -24,7 +24,7 @@ Starten Sie danach den Kernel neu und führen Sie die Importzelle aus. Wenn das 
 
 Arbeiten Sie von oben nach unten mit **Shift + Enter**. In den Aufgabenzellen ersetzen Sie jedes `...` durch Ihre Formel; die Formel und kurze Python-Hilfen stehen direkt darüber. Alle anderen Zellen sind fertig und müssen nur ausgeführt werden.
 
-Mit Ihren Umdrehungen aus Aufgabe 1 ordnet eine vorbereitete Zelle zu, welches Echo IP und welches OP ist. Nach Aufgabe 4 prüft eine Kontrollzelle Ihre Formeln. Für Kurzantworten doppelklicken Sie auf die Textzelle und schließen sie mit **Shift + Enter** ab. Speichern Sie regelmäßig mit **Strg + S / ⌘ + S**.
+Mit Ihren Phasenverschiebungen aus Aufgabe 1 ordnet eine vorbereitete Zelle zu, welches Echo IP (Restwinkel nach vollen 360°-Runden nahe 0°) und welches OP (nahe 180°) ist. Alle Größen in den Codezellen sind mit ihrer Einheit kommentiert. Nach Aufgabe 4 prüft eine Kontrollzelle Ihre Formeln. Für Kurzantworten doppelklicken Sie auf die Textzelle und schließen sie mit **Shift + Enter** ab. Speichern Sie regelmäßig mit **Strg + S / ⌘ + S**.
 
 ## Daten mit festen Dateinamen
 

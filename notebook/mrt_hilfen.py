@@ -1,6 +1,6 @@
 """Hilfen für das MRT-Praktikum: Laden, Prüfen und Anzeigen.
 
-Alle Formeln (chemische Umdrehungen, Phasendifferenz, Farbgewichte,
+Alle Formeln (chemische Phasenverschiebung, Phasendifferenz, Farbgewichte,
 Signalanteile, B0-Frequenz) stehen sichtbar im Notebook. Dieses Modul lädt
 die Dual- und Triple-Echo-Bilder mit festen Dateinamen, prüft, dass sie
 zusammengehören, und zeichnet die Abbildungen.
@@ -211,19 +211,22 @@ def dateiliste(ordner):
 # Vorbereitete Schritte, die keine Aufgabe sind
 # ----------------------------------------------------------------------------
 
-def ip_op_zuordnen(dual, umdrehung_1, umdrehung_2):
-    """IP- und OP-Echo anhand der berechneten chemischen Umdrehungen zuordnen.
+def ip_op_zuordnen(dual, phase_cs_1_grad, phase_cs_2_grad):
+    """IP- und OP-Echo anhand der chemischen Phasenverschiebung in Grad zuordnen.
 
-    Das Echo, dessen Umdrehungszahl näher an einer ganzen Zahl liegt, ist IP.
-    Rückgabe: ip, op, phase_ip, phase_op, meta_ip, meta_op.
+    Von jeder Phasenverschiebung werden alle vollen Runden (360°) abgezogen.
+    Das Echo mit dem Restwinkel näher an 0° ist IP, das andere OP.
+    Rückgabe: ip, op [a.u.], phase_ip, phase_op [rad], meta_ip, meta_op.
     """
-    abstand = [abs(u - round(u)) for u in (umdrehung_1, umdrehung_2)]
-    i_ip = 0 if abstand[0] < abstand[1] else 1
+    winkel = (phase_cs_1_grad, phase_cs_2_grad)
+    rest = [w % 360 for w in winkel]                    # Restwinkel 0 bis 360 [°]
+    abstand_0 = [min(r, 360 - r) for r in rest]          # Abstand zu 0° bzw. 360° [°]
+    i_ip = 0 if abstand_0[0] < abstand_0[1] else 1
     i_op = 1 - i_ip
-    umdrehungen = (umdrehung_1, umdrehung_2)
-    for i, name in ((i_ip, 'IP'), (i_op, 'OP')):
-        print(f'Echo {i + 1}: TE {dual.te_ms[i]:g} ms, {umdrehungen[i]:.2f} Umdrehungen → {name}')
-    if abstand[i_ip] > 0.2 or abs(abstand[i_op] - 0.5) > 0.2:
+    for i, name in ((i_ip, 'IP (Restwinkel nahe 0°)'), (i_op, 'OP (Restwinkel nahe 180°)')):
+        print(f'Echo {i + 1}: TE {dual.te_ms[i]:g} ms, Phasenverschiebung {winkel[i]:.0f}° '
+              f'= {int(winkel[i] // 360)} volle Runde(n) + {rest[i]:.0f}° → {name}')
+    if abstand_0[i_ip] > 72 or abs(abstand_0[i_op] - 180) > 72:
         print('Hinweis: Die Echos sind nur grob IP/OP. Rechnung und Echozeiten prüfen.')
     return (dual.magnitude[i_ip], dual.magnitude[i_op], dual.phase[i_ip], dual.phase[i_op],
             dual.meta[i_ip], dual.meta[i_op])

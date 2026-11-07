@@ -397,6 +397,7 @@ Sie nehmen die beiden Echozeiten auf zwei Arten auf: In \textbf{Methode A} messe
 
 \bild[trim={.21\width} {.47\height} {0\width} {.045\height},clip]{SCAN_RESULT.png}{Survey als Orientierung für eine gemeinsame Ebene durch beide Flüssigkeitsbereiche. Ordnen Sie Wasser und Öl anhand der bekannten Befüllung und dokumentierten Lagerung zu. Die Bildhelligkeit allein erlaubt keine eindeutige Zuordnung.}
 
+\newpage
 \subhead{Methode A: Zwei Single-Echo-Aufnahmen vergleichen}
 \begin{enumerate}
 \item Laden Sie \seq{T1W\_FFE IP} und übernehmen Sie die festgelegte Geometrie. Stellen Sie im Reiter \ui{Contrast} die Zeile \ui{Echoes} auf 1, stellen Sie die Zeile \ui{TE} auf \ui{user defined} und tragen Sie Ihr berechnetes $TE_\mathrm{IP}$ ein (Bedienung in Abschnitt \hyperref[parameter]{06}).
@@ -412,6 +413,7 @@ Sie nehmen die beiden Echozeiten auf zwei Arten auf: In \textbf{Methode A} messe
 \par\vspace{1mm}\noindent Beobachtung: \hrulefill
 \end{note}
 
+\newpage
 \subhead{Methode B: Dual-Echo-Messung für die Python-Auswertung}
 \begin{enumerate}
 \item Laden Sie \seq{T1W\_FFE dual echo} und übernehmen Sie dieselbe Geometrie wie in Methode A. Beide Echos stammen hier aus \textbf{derselben Akquisition}.
@@ -453,6 +455,7 @@ Ein beliebiges IP-/OP-Phasenpaar vermischt chemische Phase und Feldphase. Verwen
 \par $\Delta TE=$ \blank\ ms \hfill $|\Delta f_\mathrm{cs}|\,\Delta TE=$ \blank\ Umdrehungen
 \end{note}
 
+\newpage
 \subhead{Methode A: Drei Single-Echo-Aufnahmen vergleichen}
 \begin{enumerate}
 \item Nehmen Sie für \textbf{jede der drei Echozeiten} eine eigene Messung mit einem Echo auf. Verwenden Sie für IP-Zeiten \seq{T1W\_FFE IP} und für OP-Zeiten \seq{T1W\_FFE OP} und übernehmen Sie jeweils die festgelegte Geometrie.
@@ -462,6 +465,7 @@ Ein beliebiges IP-/OP-Phasenpaar vermischt chemische Phase und Feldphase. Verwen
 \item Vergleichen Sie die drei \textbf{Magnitudenbilder auf derselben Ebene}. Ordnen Sie jedem Bild anhand von $|\Delta f_\mathrm{cs}|\,TE$ den chemischen Phasenzustand zu. Beschreiben Sie Signaländerungen in Wasser, Öl und an ihrem Übergang. Ähneln sich die beiden äußeren Bilder, wie es ihr gleicher Phasenzustand erwarten lässt?
 \end{enumerate}
 
+\newpage
 \subhead{Methode B: Triple-Echo-Messung für Export und \texorpdfstring{$B_0$}{B0}-Auswertung}
 \begin{enumerate}
 \item Laden Sie \seq{T1W\_FFE triple echo}, übernehmen Sie dieselbe Geometrie wie in Methode A und stellen Sie unter \ui{Contrast $\rightarrow$ Echoes} drei Echos ein.
@@ -562,5 +566,48 @@ Triple-Echo mit $B_0$ & 6 Echobilder \newline (1 Serie) & Drei Magnituden und dr
 Arbeiten Sie nach dem Datenexport im Jupyter-Notebook weiter. Lesen Sie zuerst die Anweisungen in \texttt{notebook/README.md} im Repository und folgen Sie den dort beschriebenen Schritten.
 
 Laden Sie Ihre exportierten Dateien in den Ordner \texttt{notebook/daten/eigene} hoch. Das Notebook lädt die Bilder über \textbf{feste Dateinamen}: Benennen Sie die zehn Bilder Ihrer gewählten Schicht um in \texttt{eigene\_dual\_echo1\_magnitude.dcm}, \texttt{eigene\_dual\_echo1\_phase.dcm}, \ldots\ bis \texttt{eigene\_triple\_echo3\_phase.dcm}; Echo~1 ist jeweils das Echo mit der kürzesten Echozeit. Die Funktion \texttt{mh.dateiliste("daten/eigene")} zeigt dazu für jede Datei Aufnahme, Bildtyp und Echozeit. Setzen Sie anschließend in der Ladezelle \texttt{DATENORDNER = "daten/eigene"} und \texttt{PRAEFIX = "eigene"}.
+
+\newpage
+\heading{faq}{14 / FAQ}{Häufige Fragen}
+{\small Die Angaben stammen, wo vermerkt, aus der Gebrauchsanweisung des Scanners: Philips, \emph{Instructions for Use, Ingenia Elition}, 2018.}
+
+\subhead{Wie bediene ich die Bildanzeige mit der Maus?}
+Fensterung, Zoom und Verschieben erfolgen direkt mit der Maus. Die Mausbewegung muss im aktuellen Bildfenster beginnen (Gebrauchsanweisung S.\,384--385).
+
+\begin{tabularx}{\linewidth}{@{}P{42mm}P{52mm}Y@{}}
+\toprule
+\textbf{Funktion} & \textbf{Maustaste und Bewegung} & \textbf{Wirkung} \\
+\midrule
+Helligkeit (Fenstermitte) & mittlere Taste, nach oben/unten ziehen & nach oben dunkler, nach unten heller \\
+Kontrast (Fensterbreite) & mittlere Taste, nach links/rechts ziehen & nach rechts weniger, nach links mehr Kontrast \\
+Zoom & mittlere + rechte Taste, nach oben/unten ziehen & nach oben vergrößern (bis 8-fach), nach unten verkleinern \\
+Verschieben & mittlere + linke Taste ziehen & Bildausschnitt in alle Richtungen verschieben \\
+Schichten blättern & im Bild nach links/rechts ziehen oder Pfeiltasten links/rechts & nächste bzw.\ vorherige Schicht \\
+\bottomrule
+\end{tabularx}
+
+\subhead{Bei welchen Echozeiten sind Wasser und Fett bei 1{,}5\,T in Phase oder gegenphasig?}
+Die Gebrauchsanweisung (S.\,864) nennt für 1{,}5\,T folgende berechnete Echozeiten:
+
+\begin{tabularx}{\linewidth}{@{}P{48mm}Y Y Y Y Y@{}}
+\toprule
+\textbf{Phasenlage} & \multicolumn{5}{l}{\textbf{Echozeit TE [ms]}} \\
+\midrule
+In Phase (IP) & 4,6 & 9,2 & 13,8 & 18,4 & 23,0 \\
+Gegenphasig (OP) & 2,3 & 6,9 & 11,5 & 16,1 & 20,7 \\
+\bottomrule
+\end{tabularx}
+
+Die IP-Zeiten sind Vielfache von $4{,}6\ms$, die OP-Zeiten liegen genau dazwischen. Daraus folgt ein angenommener Frequenzabstand von $1/4{,}6\ms\approx 217\,\mathrm{Hz}$, bei $63{,}9\,\mathrm{MHz}$ also etwa $3{,}4\,\mathrm{ppm}$. Die Anleitung weist ausdrücklich darauf hin, dass dies berechnete Werte sind und die tatsächlichen Werte von der Zusammensetzung des Fetts abhängen. Dafür gibt es mehrere Gründe:
+\begin{itemize}
+\item \textbf{Fett hat kein einzelnes Resonanzsignal.} Die Protonen in Fettsäuren sitzen in verschiedenen chemischen Gruppen und haben deshalb unterschiedliche chemische Verschiebungen. Der größte Peak (CH$_2$-Gruppen) liegt etwa $3{,}4$ bis $3{,}5\,\mathrm{ppm}$ neben Wasser; mehrere kleinere Peaks liegen bei anderen Abständen, einer (Doppelbindungen, CH=CH) sogar dicht neben dem Wasserpeak. Das gemessene Fettsignal ist die Summe dieser Anteile, sodass Wasser und Fett nie bei genau einer Echozeit vollständig gleich- oder gegenphasig sind.
+\item \textbf{Die Zusammensetzung unterscheidet sich.} Speiseöl, Körperfett und Knochenmark enthalten unterschiedlich viele gesättigte und ungesättigte Fettsäuren. Damit ändern sich die relativen Höhen der Fettpeaks und der wirksame Frequenzabstand.
+\item \textbf{Kleine Abweichungen summieren sich.} Mit $3{,}5\,\mathrm{ppm}$ statt $3{,}4\,\mathrm{ppm}$ ergibt sich $T_\mathrm{cs}\approx 4{,}47\ms$ statt $4{,}6\ms$. Beim fünften IP-Zeitpunkt beträgt der Unterschied bereits rund $0{,}6\ms$.
+\item \textbf{Temperatur und Gerät.} Die Wasserfrequenz verschiebt sich mit der Temperatur um etwa $-0{,}01\,\mathrm{ppm}$ pro Grad Celsius. Außerdem setzt der Scanner die Echozeiten auf sein Zeitraster; maßgeblich sind die tatsächlichen Werte im Reiter \ui{Info} bzw.\ in den DICOM-Daten.
+\end{itemize}
+Verwenden Sie die Tabelle deshalb nur zur Orientierung. Berechnen Sie Ihre Echozeiten aus dem selbst gemessenen Peakabstand (Abschnitt \hyperref[spektrum]{09}) und prüfen Sie sie mit Methode A in Abschnitt \hyperref[dual]{10}.
+
+\subhead{Warum liegen nach dem Export mehrere Serien pro Messung auf dem USB-Stick?}
+Mit der Option \ui{Series Split} teilt der DICOM-Export Mehr-Echo-Messungen in \textbf{eine eigene Serie pro Echo} auf (Gebrauchsanweisung S.\,823). Eine Dual-Echo-Messung erscheint deshalb als zwei Serien, eine Triple-Echo-Messung als drei. Die Seriennummern der neuen Serien werden aus der Nummer der ursprünglichen Messung abgeleitet, sodass sie sich wieder zuordnen lassen. Für das Notebook wählen Sie aus diesen Serien die Einzelbilder Ihrer Schicht aus: \texttt{mh.dateiliste("daten/eigene")} zeigt für jede Datei Aufnahme, Bildtyp und Echozeit. Benennen Sie die Bilder dann nach dem festen Schema um (Abschnitt \hyperref[export]{13}).
 
 \end{document}
