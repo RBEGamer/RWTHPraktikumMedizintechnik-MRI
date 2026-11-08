@@ -586,6 +586,40 @@ Schichten blättern & im Bild nach links/rechts ziehen oder Pfeiltasten links/re
 \bottomrule
 \end{tabularx}
 
+\subhead{Welches Koordinatensystem verwendet der Scanner?}
+Der Scanner beschreibt alle Richtungen im \textbf{Patientenkoordinatensystem}, also relativ zum Patienten bzw.\ Phantom und nicht relativ zum Raum oder zum Magneten. Die Buchstaben am Bildrand zeigen diese Richtungen an (Abschnitt \hyperref[viewer]{05}).
+
+\begin{tabularx}{\linewidth}{@{}P{20mm}P{30mm}Y@{}}
+\toprule
+\textbf{Achse} & \textbf{Buchstaben} & \textbf{Richtung} \\
+\midrule
+R--L & R, L & rechts -- links des Patienten \\
+A--P & A, P & anterior (vorne, bauchseitig) -- posterior (hinten, rückenseitig) \\
+F--H & F, H & Fuß (\emph{feet}) -- Kopf (\emph{head}) \\
+\bottomrule
+\end{tabularx}
+
+Damit der Scanner diese Achsen richtig zuordnet, muss die eingetragene Lagerung stimmen. Die Eigenschaften der ExamCard enthalten dazu die \ui{Patient Orientation} (\ui{HeadFirst} oder \ui{FeetFirst}, also Kopf oder Füße zuerst in den Magneten) und die \ui{Patient Position}, z.\,B.\ \ui{Supine} (Rückenlage) oder \ui{Prone} (Bauchlage) (Gebrauchsanweisung S.\,117 und 431). Weicht die Angabe von der tatsächlichen Lagerung ab, sind die Richtungsbuchstaben im Bild vertauscht, etwa rechts und links. Der Positionierlaser markiert übrigens die mittlere sagittale und eine transversale Ebene (S.\,125).
+
+\subhead{Was bedeuten transversal, sagittal und koronal, und wie wähle ich die Ebene?}
+Die drei Hauptebenen stehen jeweils senkrecht auf einer der Achsen:
+
+\begin{tabularx}{\linewidth}{@{}P{36mm}P{26mm}P{26mm}Y@{}}
+\toprule
+\textbf{Ebene} & \textbf{senkrecht zu} & \textbf{Bildachsen} & \textbf{Anschaulich} \\
+\midrule
+Transversal (axial) & F--H & R--L und A--P & Querschnitt, wie eine Scheibe quer durch den Körper \\
+Sagittal & R--L & A--P und F--H & Seitenansicht \\
+Koronal (frontal) & A--P & R--L und F--H & Ansicht von vorne \\
+\bottomrule
+\end{tabularx}
+
+Der Survey nimmt alle drei Ebenen auf: In der Survey-Abbildung in Abschnitt \hyperref[survey]{04} zeigt das linke Bild eine sagittale, das mittlere eine koronale und das rechte eine transversale Ansicht. Erkennbar ist das an den Richtungsbuchstaben am Bildrand.
+
+Die Grundorientierung des Schichtstapels ist in jeder Sequenz vorgegeben. In der Planung (Abschnitt \hyperref[referenz]{07}) verschieben Sie den Stapel, indem Sie den Kreis in seiner Mitte ziehen. Sie kippen ihn, indem Sie eines der äußeren Quadrate der mittleren Schicht nach oben oder unten ziehen. Die Werte erscheinen als Verschiebung (\emph{Offcenter}) und Verkippung (\emph{Angulation}) im Reiter \ui{Offc/Ang} (S.\,441 und 452).
+
+\textbf{Für die Wasser-/Ölflasche:} Die Grenzfläche zwischen Öl und Wasser liegt waagerecht, das Öl schwimmt oben, bei liegender Flasche also anterior. Eine sagittale oder transversale Schicht schneidet deshalb beide Flüssigkeiten und den Übergang. Eine koronale Schicht liegt parallel zur Grenzfläche und enthält meist nur eine der beiden Flüssigkeiten.
+
 \subhead{Bei welchen Echozeiten sind Wasser und Fett bei 1{,}5\,T in Phase oder gegenphasig?}
 Die Gebrauchsanweisung (S.\,864) nennt für 1{,}5\,T folgende berechnete Echozeiten:
 
