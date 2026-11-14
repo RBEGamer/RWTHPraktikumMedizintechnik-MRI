@@ -361,43 +361,42 @@ $n$ & $TE_\mathrm{IP}=nT_\mathrm{cs}$ [ms] & $TE_\mathrm{OP}=(n+\tfrac12)T_\math
 \par\vspace{1mm}
 {\small Minimale Werte an Ihrem System: TE1 $=$ \blank\ ms, delta TE $=$ \blank\ ms.}
 
-Sie nehmen die beiden Echozeiten auf zwei Arten auf: In \methodref{A}{dual-methode-a} messen Sie zwei getrennte Single-Echo-Sequenzen und prüfen am Bildvergleich, ob Ihre Echozeiten stimmen. In \methodref{B}{dual-methode-b} nehmen Sie mit diesen Zeiten beide Echos in einer Dual-Echo-Messung auf; diese Daten werten Sie später in Python aus.
+Sie nehmen die beiden Echozeiten auf zwei Arten auf: In \methodref{A}{dual-methode-a} messen Sie zwei getrennte Single-Echo-Sequenzen und vergleichen deren Magnitudenbilder. In \methodref{B}{dual-methode-b} nehmen Sie mit denselben Zeiten beide Echos in einer Dual-Echo-Messung auf; diese Daten werten Sie später im Notebook aus.
 
 \begin{note}
 \textbf{Ihre berechneten Echozeiten:} Halten Sie den Rechenweg und die gewählten Werte von $n$ fest. Begründen Sie die IP-/OP-Zuordnung anhand Ihres gemessenen Frequenzabstands.
 \par $TE_\mathrm{OP}=$ \blank\ ms \hfill $TE_\mathrm{IP}=$ \blank\ ms
 \end{note}
 
-\bild[trim={.21\width} {.47\height} {0\width} {.045\height},clip]{SCAN_RESULT.png}{Survey als Orientierung für eine gemeinsame Ebene durch beide Flüssigkeitsbereiche. Ordnen Sie Wasser und Öl anhand der bekannten Befüllung und dokumentierten Lagerung zu. Die Bildhelligkeit allein erlaubt keine eindeutige Zuordnung.}
-
 \newpage
 \phantomsection\label{dual-methode-a}
 \subhead{Methode A: Zwei Single-Echo-Aufnahmen vergleichen}
 \begin{enumerate}
-\item Laden Sie \seq{T1W\_FFE IP} und übernehmen Sie die festgelegte Geometrie. Stellen Sie im Reiter \ui{Contrast} die Zeile \ui{Echoes} auf 1, stellen Sie die Zeile \ui{TE} auf \ui{user defined} und tragen Sie Ihr berechnetes $TE_\mathrm{IP}$ ein (Bedienung in Abschnitt \hyperref[parameter]{08}).
-\item Laden Sie anschließend \seq{T1W\_FFE OP} und gehen Sie genauso vor, nun mit Ihrem berechneten $TE_\mathrm{OP}$.
-\item Halten Sie TR, Flipwinkel und Geometrie für beide Aufnahmen gleich; nur die Echozeit unterscheidet sich. Lassen Sie jeweils die \textbf{Magnitude} rekonstruieren und speichern, ohne Fett- oder Wasserunterdrückung. Prüfen Sie die umgesetzten Werte im Reiter \ui{Info}.
-\item Bestätigen Sie jeweils mit \ui{Accept} und starten Sie mit \ui{Start Scan}.
-\item Stellen Sie beide Bilder in zwei Bildfenstern auf derselben Schichtnummer nebeneinander. Vergleichen Sie das Signal in \textbf{Wasser}, in \textbf{Öl} und am \textbf{Übergang}: Wo unterscheiden sich die beiden Echozeiten, und wo nicht?
+\item Laden Sie \seq{T1W\_FFE IP} und übernehmen Sie die festgelegte Geometrie. Stellen Sie unter \ui{Contrast} die Zeile \ui{Echoes} auf 1 und \ui{TE} auf \ui{user defined}; tragen Sie Ihr $TE_\mathrm{IP}$ ein (Abschnitt \hyperref[parameter]{08}). Wiederholen Sie dies mit \seq{T1W\_FFE OP} und Ihrem $TE_\mathrm{OP}$.
+\item Halten Sie TR, Flipwinkel und Geometrie gleich. Speichern Sie jeweils die \textbf{Magnitude}, ohne Fett- oder Wasserunterdrückung. Prüfen Sie die tatsächlichen TE unter \ui{Info}; bestätigen Sie jede Aufnahme mit \ui{Accept} und starten Sie mit \ui{Start Scan}.
+\item Stellen Sie beide Bilder auf derselben Schichtnummer nebeneinander. Vergleichen Sie \textbf{Wasser}, \textbf{Öl} und den \textbf{Übergang}: Wo unterscheiden sich die Bilder, und wo nicht?
 \end{enumerate}
 
+\noindent\begin{minipage}[t]{.34\linewidth}\vspace{0pt}
+\bild[trim={.21\width} {.47\height} {0\width} {.045\height},clip]{SCAN_RESULT.png}{Gemeinsame Ebene durch beide Flüssigkeiten. Ordnen Sie Wasser und Öl anhand von Befüllung und Lagerung zu.}
+\end{minipage}\hfill
+\begin{minipage}[t]{.62\linewidth}\vspace{0pt}
 \begin{note}
-\textbf{Echozeiten bestätigen:} Zwischen IP- und OP-Bild sollten deutliche Unterschiede zwischen Wasser und Öl sichtbar sein, besonders am Übergang. Ist das nicht der Fall, prüfen Sie Ihre Rechnung und passen Sie die Echozeiten an. Die so bestätigten Zeiten verwenden Sie in \methodref{B}{dual-methode-b}.
-\par $TE_\mathrm{OP}=$ \blank\ ms \hfill $TE_\mathrm{IP}=$ \blank\ ms
-\par\vspace{1mm}\noindent Beobachtung: \hrulefill
+\textbf{Echozeiten prüfen:} Prüfen Sie Rechnung und tatsächliche TE. Eine OP-Signalauslöschung entsteht im vereinfachten Modell dort, wo Wasser und Fett \textbf{im selben Pixel} beitragen, etwa am Übergang. In reinen Bereichen kann sie fehlen. Fehlender Kontrast allein ist daher kein Grund, die TE zu ändern. Verwenden Sie die geprüften Zeiten in \methodref{B}{dual-methode-b}.
 \end{note}
+\end{minipage}
+\par\vspace{1mm}
+$TE_\mathrm{OP}=$ \blank\ ms \hfill $TE_\mathrm{IP}=$ \blank\ ms
+\par Beobachtung: \hrulefill
 
-\newpage
 \phantomsection\label{dual-methode-b}
 \subhead{Methode B: Dual-Echo-Messung für die Python-Auswertung}
 \begin{enumerate}
-\item Laden Sie \seq{T1W\_FFE dual echo} und übernehmen Sie dieselbe Geometrie wie in \methodref{A}{dual-methode-a}. Beide Echos stammen hier aus \textbf{derselben Akquisition}.
-\item Öffnen Sie \ui{Contrast}, stellen Sie \ui{Echoes} auf 2 und wählen Sie bei \ui{TE first} und \ui{echospacing} jeweils \ui{user defined}. Verwenden Sie die \textbf{in \methodref{A}{dual-methode-a} bestätigten Echozeiten}: die kleinere als \ui{TE first}, die Differenz beider Zeiten als \ui{echospacing}. Prüfen Sie im Reiter \ui{Info} die umgesetzten Werte.
-\item Lassen Sie \textbf{Magnitudenbilder beider Echos} rekonstruieren und speichern. Verwenden Sie keine Fett- oder Wasserunterdrückung.
-\item Bestätigen Sie mit \ui{Accept}, starten Sie mit \ui{Start Scan} und öffnen Sie nach Messende das Ergebnis per Doppelklick.
-\item Wählen Sie die Echobilder wie in der \hyperref[faq]{FAQ zur Bild-/Echoauswahl} (S.\,\pageref*{faq}) beschrieben. Vergleichen Sie beide Echos auf derselben Schichtnummer mit den Einzelaufnahmen aus \methodref{A}{dual-methode-a}.
+\item Laden Sie \seq{T1W\_FFE dual echo} und übernehmen Sie dieselbe Geometrie wie in \methodref{A}{dual-methode-a}. Stellen Sie unter \ui{Contrast} die Zeile \ui{Echoes} auf 2. Beide Echos stammen aus \textbf{einer gemeinsamen Aufnahme}.
+\item Wählen Sie für \ui{TE first} und \ui{echospacing} jeweils \ui{user defined}: Tragen Sie die kleinere der geprüften Zeiten als \ui{TE first} und die Differenz als \ui{echospacing} ein. Kontrollieren Sie die tatsächlichen Werte unter \ui{Info}.
+\item Speichern Sie \textbf{Magnitude und Phase beider Echos}, ohne Fett- oder Wasserunterdrückung. Bestätigen Sie mit \ui{Accept}, starten Sie mit \ui{Start Scan} und öffnen Sie danach das Ergebnis per Doppelklick.
+\item Wählen Sie die Echos wie in der \hyperref[faq]{FAQ zur Bild-/Echoauswahl} (S.\,\pageref*{faq}). Vergleichen Sie die Magnituden auf derselben Schichtnummer mit \methodref{A}{dual-methode-a}. Diese gemeinsame Aufnahme exportieren Sie für das Notebook (Abschnitt \hyperref[export]{13}).
 \end{enumerate}
-Diese Dual-Echo-Serie ist die Grundlage für die Wasser-Fett-Trennung im Jupyter-Notebook (Abschnitt \hyperref[export]{13}).
 
 \newpage
 \heading{flipwinkel}{10 / FLIPWINKEL}{Zwei Flipwinkel aufnehmen und mit den Referenzen vergleichen}
@@ -431,13 +430,13 @@ Flipwinkel 2 & \hrulefill & \hrulefill & \hrulefill & \hrulefill \\
 
 \newpage
 \heading{triple}{11 / DREI ECHOS}{Triple-Echo-Messung und optionale \texorpdfstring{$B_0$}{B0}-Karte}
-Berechnen Sie aus Ihrem gemessenen Frequenzabstand \textbf{drei geeignete, aufsteigende Echozeiten}. Verwenden Sie dazu die IP-/OP-Beziehungen und die minimalen Echozeiten aus Abschnitt \hyperref[dual]{09}. Die drei Echos liegen am Scanner äquidistant (Abschnitt \hyperref[parameter]{08}), daher gilt $TE_3-TE_1=2\,\Delta TE$. Planen Sie für die optionale $B_0$-Aufgabe die beiden äußeren Echos mit annähernd gleichem chemischen Phasenzustand:
+Berechnen Sie \textbf{drei aufsteigende, äquidistante Echozeiten} aus Ihrem gemessenen Frequenzabstand. Beachten Sie die IP-/OP-Beziehungen und Systemgrenzen aus Abschnitt \hyperref[dual]{09}. Für die optionale $B_0$-Karte sollen Echo 1 und 3 annähernd denselben chemischen Phasenzustand haben:
 \[
 \Delta TE\approx\frac{k}{2}\,T_\mathrm{cs},\qquad k\in\mathbb{N}.
 \]
-Mit $k=1$ und $TE_1\approx nT_\mathrm{cs}$ erhalten Sie die Folge IP, OP, IP; mit $TE_1\approx(n+\tfrac12)T_\mathrm{cs}$ die Folge OP, IP, OP.
+Mit $k=1$ und $TE_1\approx nT_\mathrm{cs}$ entsteht IP, OP, IP; mit $TE_1\approx(n+\tfrac12)T_\mathrm{cs}$ entsteht OP, IP, OP.
 
-Wie bei zwei Echos nehmen Sie die drei Echozeiten auf zwei Arten auf: In \methodref{A}{triple-methode-a} messen Sie drei getrennte Single-Echo-Sequenzen und vergleichen die Magnitudenbilder. In \methodref{B}{triple-methode-b} nehmen Sie mit diesen Zeiten alle drei Echos in einer Triple-Echo-Messung auf; diese Daten exportieren Sie für die Auswertung.
+Vergleichen Sie zunächst drei Einzelaufnahmen (\methodref{A}{triple-methode-a}). Für das Notebook nehmen Sie anschließend alle Echos gemeinsam auf (\methodref{B}{triple-methode-b}).
 
 \begin{tabularx}{\linewidth}{@{}P{12mm}P{30mm}P{60mm}Y@{}}
 \toprule
@@ -450,26 +449,23 @@ Wie bei zwei Echos nehmen Sie die drei Echozeiten auf zwei Arten auf: In \method
 \end{tabularx}
 
 \subhead{Den Abstand zwischen Echo 1 und 3 berechnen}
-Berechnen Sie für die beiden äußeren Echos $\Delta TE_{13}=TE_3-TE_1$. Dieser gesamte Abstand ist doppelt so groß wie das am Scanner eingestellte \ui{echospacing}. Prüfen Sie, ob dazwischen näherungsweise eine ganze Zahl chemischer Umdrehungen liegt; verwenden Sie den Frequenzabstand in Hz und den Echoabstand in Sekunden:
+Der äußere Abstand $\Delta TE_{13}=TE_3-TE_1=2\,\Delta TE$ ist doppelt so groß wie \ui{echospacing}. Prüfen Sie die Zahl chemischer Umdrehungen mit dem Frequenzabstand in Hz und dem äußeren Abstand in Sekunden:
 \[
 |\Delta f_\mathrm{cs}|\,(TE_3-TE_1)\approx k,\qquad k\in\mathbb{Z}.
 \]
-Ein beliebiges IP-/OP-Phasenpaar vermischt chemische Phase und Feldphase. Verwenden Sie in der Auswertung die \textbf{tatsächlichen TE aus DICOM} und prüfen Sie die Bedingung damit erneut.
+Verwenden Sie später die \textbf{tatsächlichen TE aus DICOM} für diese Prüfung. Ein beliebiges IP-/OP-Paar vermischt chemische Phase und Feldphase.
 
 \begin{note}
-\textbf{Ihre Rechnung:} Dokumentieren Sie den Echoabstand und die Zahl der chemischen Umdrehungen. Begründen Sie, weshalb Ihre gewählten Echozeiten für die Feldkarte geeignet sind.
+\textbf{Ihre Rechnung:} Dokumentieren Sie den äußeren Echoabstand und die Zahl der chemischen Umdrehungen. Warum eignen sich diese Zeiten für die Feldkarte?
 \par $\Delta TE_{13}=$ \blank\ ms \hfill $|\Delta f_\mathrm{cs}|\,\Delta TE_{13}=$ \blank\ Umdrehungen
 \end{note}
 
-\newpage
 \phantomsection\label{triple-methode-a}
 \subhead{Methode A: Drei Single-Echo-Aufnahmen vergleichen}
 \begin{enumerate}
-\item Nehmen Sie für \textbf{jede der drei Echozeiten} eine eigene Messung mit einem Echo auf. Verwenden Sie für IP-Zeiten \seq{T1W\_FFE IP} und für OP-Zeiten \seq{T1W\_FFE OP} und übernehmen Sie jeweils die festgelegte Geometrie.
-\item Stellen Sie im Reiter \ui{Contrast} die Zeile \ui{Echoes} auf 1, stellen Sie die Zeile \ui{TE} auf \ui{user defined} und tragen Sie die jeweilige Echozeit ein. Jede Zeit muss mindestens der minimalen TE1 entsprechen.
-\item Halten Sie TR, Flipwinkel und Geometrie für alle drei Aufnahmen gleich; nur die Echozeit unterscheidet sich. Lassen Sie jeweils die \textbf{Magnitude} rekonstruieren und speichern, ohne Fett- oder Wasserunterdrückung.
-\item Bestätigen Sie jeweils mit \ui{Accept} und starten Sie mit \ui{Start Scan}.
-\item Vergleichen Sie die drei \textbf{Magnitudenbilder auf derselben Ebene}. Ordnen Sie jedem Bild anhand von $|\Delta f_\mathrm{cs}|\,TE$ den chemischen Phasenzustand zu. Beschreiben Sie Signaländerungen in Wasser, Öl und an ihrem Übergang. Ähneln sich die beiden äußeren Bilder, wie es ihr gleicher Phasenzustand erwarten lässt?
+\item Wiederholen Sie \methodref{A}{dual-methode-a} für jede TE: IP-/OP-Sequenz laden, \ui{Echoes = 1}, \ui{TE = user defined}, Zeit eintragen. Beachten Sie die minimale TE1.
+\item Halten Sie TR, Flipwinkel und Geometrie gleich. Speichern Sie die \textbf{Magnitude} ohne Fett- oder Wasserunterdrückung. Prüfen Sie \ui{Info}; bestätigen und starten Sie jede Aufnahme.
+\item Vergleichen Sie dieselbe Schicht: Ordnen Sie die Phasenzustände anhand von $|\Delta f_\mathrm{cs}|\,TE$ zu. Wie ändern sich Wasser, Öl und der Übergang? Ähneln sich die äußeren Bilder?
 \end{enumerate}
 
 \newpage
@@ -546,7 +542,7 @@ Beobachtungen / Änderungen & \hrulefill \\[3mm]
 \newpage
 \heading{export}{13 / DATENEXPORT}{Classic-DICOM auf den USB-Stick exportieren}
 \begin{enumerate}
-\item Öffnen Sie \ui{Patients $\rightarrow$ Administration} (\ui{F4}). Wählen Sie die Untersuchung Ihrer Gruppe und die zu exportierenden Messungen.
+\item Öffnen Sie \ui{Patients $\rightarrow$ Administration} (\ui{F4}). Wählen Sie die Untersuchung Ihrer Gruppe und die gemeinsame Dual-Echo- bzw.\ Triple-Echo-Aufnahme. Beziehen Sie \textbf{alle zugehörigen Echos sowie Magnitude und Phase} in den Export ein.
 \item Klicken Sie unten auf \ui{Disk Files}. Wählen Sie unter \ui{Destination} über \ui{Browse\ldots} den bereitgestellten USB-Stick bzw. dessen DICOM-Zielordner.
 \item Wählen Sie im Reiter \ui{Dicom Export} das Format \ui{Classic Dicom} und aktivieren Sie \ui{Series Split}. Starten Sie den Export mit \ui{Proceed}.
 \item Schließen Sie das Fenster \ui{File Export}. Öffnen Sie in der Patientenverwaltung \ui{Manage Job Queue} und prüfen Sie den Status \textbf{Ihrer Exportaufträge}.
@@ -572,14 +568,14 @@ Auf dem Stick liegt ein \texttt{DICOM}-Verzeichnis mit den exportierten Serien, 
 \toprule
 \textbf{Für die Auswertung} & \textbf{Je Ebene} & \textbf{Benötigte Komponenten} \\
 \midrule
-Dixon (Dual-Echo) & 4 Echobilder \newline (1 Serie) & OP-/IP-Magnitude und -Phase aus \seq{T1W\_FFE dual echo}; beide Echos derselben Akquisition. \\
-Triple-Echo mit $B_0$ & 6 Echobilder \newline (1 Serie) & Drei Magnituden und drei direkte Phasen aus \seq{T1W\_FFE triple echo}; die berechneten äußeren Echozeiten auf Eignung für $B_0$ prüfen. \\
+Dixon (Dual-Echo) & 1 Aufnahme, \newline 4 Bilddateien & OP-/IP-Magnitude und -Phase aus \seq{T1W\_FFE dual echo}; beide Echos derselben Aufnahme. \\
+Triple-Echo mit $B_0$ & 1 Aufnahme, \newline 6 Bilddateien & Drei Magnituden und drei direkte Phasen aus \seq{T1W\_FFE triple echo}; äußere Echozeiten auf Eignung für $B_0$ prüfen. \\
 \bottomrule
 \end{tabularx}}
-{\small Exportiert werden \textbf{nur die Dual-Echo- und die Triple-Echo-Serie}; die Single-Echo-Aufnahmen aus \methodref{A}{dual-methode-a} bzw.\ \methodref{A}{triple-methode-a} dienen nur dem Vergleich am Scanner. Zusammen ergeben sich \textbf{zehn benötigte Echobilder pro Ebene}. Weitere exportierte Komponenten und der ganze Schichtstapel dürfen enthalten sein.}
+{\small Exportieren Sie \textbf{alle zugehörigen Serien der beiden gemeinsamen Aufnahmen}. \ui{Series Split} verteilt die Aufnahmen auf mehrere Serien (\hyperref[faq-export]{FAQ}, S.\,\pageref*{faq-export}). Pro Ebene benötigen Sie \textbf{zehn Bilddateien}. Die Single-Echo-Aufnahmen aus \methodref{A}{dual-methode-a} bzw.\ \methodref{A}{triple-methode-a} dienen nur dem Vergleich am Scanner. Der ganze Schichtstapel darf enthalten sein.}
 
 \subhead{Im Notebook weiterarbeiten}
-Lesen Sie zuerst \texttt{notebook/README.md} und arbeiten Sie danach im Jupyter-Notebook weiter. Laden Sie die zehn Bilder Ihrer Schicht nach \texttt{notebook/daten/eigene} hoch und benennen Sie sie nach dem Schema der README (Echo~1: kürzeste TE). \texttt{mh.dateiliste("daten/eigene")} zeigt Aufnahme, Bildtyp und TE zur Zuordnung. Verwenden Sie in der Ladezelle \texttt{DATENORDNER = "daten/eigene"} und \mbox{\texttt{\detokenize{PRAEFIX = "eigene"}}}.
+Lesen Sie zuerst \texttt{notebook/README.md}. Laden Sie Ihre zehn Bilddateien nach \nolinkurl{notebook/daten/eigene} hoch. Benennen Sie sie nach dem Schema der README (Echo~1: kürzeste TE). Ersetzen Sie die Demodaten-Angaben im Notebook: \texttt{DATENORDNER = "daten/eigene"}, \mbox{\texttt{\detokenize{PRAEFIX = "eigene"}}}.
 
 \newpage
 \heading{faq}{14 / FAQ}{Häufige Fragen}
@@ -617,6 +613,7 @@ F--H & F, H & Fuß (\emph{feet}) -- Kopf (\emph{head}) \\
 
 Damit der Scanner diese Achsen richtig zuordnet, muss die eingetragene Lagerung stimmen. Die Eigenschaften der ExamCard enthalten dazu die \ui{Patient Orientation} (\ui{HeadFirst} oder \ui{FeetFirst}, also Kopf oder Füße zuerst in den Magneten) und die \ui{Patient Position}, z.\,B.\ \ui{Supine} (Rückenlage) oder \ui{Prone} (Bauchlage) (Gebrauchsanweisung S.\,117 und 431). Weicht die Angabe von der tatsächlichen Lagerung ab, sind die Richtungsbuchstaben im Bild vertauscht, etwa rechts und links. Der Positionierlaser markiert übrigens die mittlere sagittale und eine transversale Ebene (S.\,125).
 
+\newpage
 \subhead{Was bedeuten transversal, sagittal und koronal, und wie wähle ich die Ebene?}
 Die drei Hauptebenen stehen jeweils senkrecht auf einer der Achsen:
 
@@ -648,16 +645,14 @@ Gegenphasig (OP) & 2,3 & 6,9 & 11,5 & 16,1 & 20,7 \\
 \bottomrule
 \end{tabularx}
 
-Die IP-Zeiten sind Vielfache von $4{,}6\ms$, die OP-Zeiten liegen genau dazwischen. Daraus folgt ein angenommener Frequenzabstand von $1/4{,}6\ms\approx 217\,\mathrm{Hz}$, bei $63{,}9\,\mathrm{MHz}$ also etwa $3{,}4\,\mathrm{ppm}$. Die Anleitung weist ausdrücklich darauf hin, dass dies berechnete Werte sind und die tatsächlichen Werte von der Zusammensetzung des Fetts abhängen. Dafür gibt es mehrere Gründe:
-\begin{itemize}
-\item \textbf{Fett hat kein einzelnes Resonanzsignal.} Die Protonen in Fettsäuren sitzen in verschiedenen chemischen Gruppen und haben deshalb unterschiedliche chemische Verschiebungen. Der größte Peak (CH$_2$-Gruppen) liegt etwa $3{,}4$ bis $3{,}5\,\mathrm{ppm}$ neben Wasser; mehrere kleinere Peaks liegen bei anderen Abständen, einer (Doppelbindungen, CH=CH) sogar dicht neben dem Wasserpeak. Das gemessene Fettsignal ist die Summe dieser Anteile, sodass Wasser und Fett nie bei genau einer Echozeit vollständig gleich- oder gegenphasig sind.
-\item \textbf{Die Zusammensetzung unterscheidet sich.} Speiseöl, Körperfett und Knochenmark enthalten unterschiedlich viele gesättigte und ungesättigte Fettsäuren. Damit ändern sich die relativen Höhen der Fettpeaks und der wirksame Frequenzabstand.
-\item \textbf{Kleine Abweichungen summieren sich.} Mit $3{,}5\,\mathrm{ppm}$ statt $3{,}4\,\mathrm{ppm}$ ergibt sich $T_\mathrm{cs}\approx 4{,}47\ms$ statt $4{,}6\ms$. Beim fünften IP-Zeitpunkt beträgt der Unterschied bereits rund $0{,}6\ms$.
-\item \textbf{Temperatur und Gerät.} Die Wasserfrequenz verschiebt sich mit der Temperatur um etwa $-0{,}01\,\mathrm{ppm}$ pro Grad Celsius. Außerdem setzt der Scanner die Echozeiten auf sein Zeitraster; maßgeblich sind die tatsächlichen Werte im Reiter \ui{Info} bzw.\ in den DICOM-Daten.
-\end{itemize}
-Verwenden Sie die Tabelle deshalb nur zur Orientierung. Berechnen Sie Ihre Echozeiten aus dem selbst gemessenen Peakabstand (Abschnitt \hyperref[spektrum]{07}) und prüfen Sie sie mit \methodref{A}{dual-methode-a} in Abschnitt \hyperref[dual]{09}.
+Verwenden Sie diese Werte nur zur Orientierung: Fett besitzt mehrere Resonanzanteile, deren Gewichtung von der Zusammensetzung abhängt. Berechnen Sie Ihre eigenen TE aus dem gemessenen Peakabstand (Abschnitt \hyperref[spektrum]{07}) und prüfen Sie die tatsächlichen TE unter \ui{Info} bzw.\ in DICOM. Die Grundlagen erklärt das Versuchsskript in Abschnitt 3 (\emph{Die DIXON-Methode: Fett-Wasser-Trennung}).
 
+\phantomsection\label{faq-export}
 \subhead{Warum liegen nach dem Export mehrere Serien pro Messung auf dem USB-Stick?}
-Mit der Option \ui{Series Split} teilt der DICOM-Export Mehr-Echo-Messungen in \textbf{eine eigene Serie pro Echo} auf (Gebrauchsanweisung S.\,823). Eine Dual-Echo-Messung erscheint deshalb als zwei Serien, eine Triple-Echo-Messung als drei. Die Seriennummern der neuen Serien werden aus der Nummer der ursprünglichen Messung abgeleitet, sodass sie sich wieder zuordnen lassen. Für das Notebook wählen Sie aus diesen Serien die Einzelbilder Ihrer Schicht aus: \texttt{mh.dateiliste("daten/eigene")} zeigt für jede Datei Aufnahme, Bildtyp und Echozeit. Benennen Sie die Bilder dann nach dem festen Schema um (Abschnitt \hyperref[export]{13}).
+Eine \textbf{Aufnahme} ist eine Messung am Scanner. Eine \textbf{Serie} gruppiert die exportierten DICOM-Bilder; eine \textbf{Bilddatei} enthält hier eine Schicht eines Echos als Magnitude oder Phase.
+
+\ui{Series Split} trennt Mehr-Echo-Aufnahmen beim Export nach Echo (Gebrauchsanweisung S.\,823). Die Seriennummern werden aus der ursprünglichen Messung abgeleitet; die Zahl der Serien ist daher nicht die Zahl der Aufnahmen oder Bilddateien. Exportieren Sie \textbf{alle zugehörigen Echo- und Komponenten-Serien}. Wählen Sie daraus dieselbe Schicht für alle Echos: Dual-Echo liefert zwei Magnituden und zwei Phasen, Triple-Echo drei Magnituden und drei Phasen, insgesamt \textbf{zehn Bilddateien}.
+
+\texttt{mh.dateiliste("daten/eigene")} zeigt Aufnahme, Bildtyp und TE zur Zuordnung. Benennen Sie die Dateien nach dem Schema der Notebook-README um (Abschnitt \hyperref[export]{13}).
 
 \end{document}
